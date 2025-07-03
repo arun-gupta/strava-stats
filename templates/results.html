@@ -3,13 +3,39 @@
 {% block content %}
 {% if message %}
     <div class="alert alert-info">{{ message }}</div>
+    {% if start_date and end_date %}
+        <div class="alert alert-secondary">
+            <strong>📅 Analysis Period:</strong> {{ start_date }} to {{ end_date }}
+        </div>
+    {% endif %}
     <a href="{{ url_for('index') }}" class="btn btn-primary">← Back to Dashboard</a>
 {% else %}
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <h2>Activity Analysis Results</h2>
+                <div>
+                    <h2>Activity Analysis Results</h2>
+                    <div class="text-muted">
+                        <i class="fas fa-calendar-alt"></i> 
+                        <strong>Analysis Period:</strong> {{ analysis.date_range_formatted }}
+                    </div>
+                </div>
                 <a href="{{ url_for('index') }}" class="btn btn-outline-primary">← New Analysis</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Range and Summary Stats -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="card-body text-center">
+                    <h4 class="card-title mb-2">
+                        <i class="fas fa-calendar-alt"></i> Analysis Period
+                    </h4>
+                    <h5 class="mb-0">{{ analysis.date_range_formatted }}</h5>
+                    <small class="opacity-75">{{ analysis.total_activities }} activities analyzed</small>
+                </div>
             </div>
         </div>
     </div>
@@ -166,6 +192,7 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Key Insights</h5>
+                    <small class="text-muted">Based on activities from {{ analysis.date_range_formatted }}</small>
                 </div>
                 <div class="card-body">
                     <ul class="list-unstyled">

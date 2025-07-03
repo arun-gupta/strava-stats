@@ -148,10 +148,17 @@ def analyze():
     
     if not activities:
         return render_template('results.html', 
-                             message="No activities found in the specified date range.")
+                             message="No activities found in the specified date range.",
+                             start_date=start_date_str,
+                             end_date=end_date_str)
     
     # Process activities data
     analysis = process_activities(activities, session['access_token'])
+    
+    # Add date range to analysis results
+    analysis['start_date'] = start_date_str
+    analysis['end_date'] = end_date_str
+    analysis['date_range_formatted'] = f"{start_date.strftime('%B %d, %Y')} - {end_date.strftime('%B %d, %Y')}"
     
     return render_template('results.html', analysis=analysis)
 
