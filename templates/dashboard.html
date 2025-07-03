@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Activity Analysis</h3>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-4">
+                    Select a date range to analyze your Strava activities and get detailed insights.
+                </p>
+                
+                <form method="POST" action="{{ url_for('analyze') }}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            📊 Analyze Activities
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">What you'll get:</h5>
+                <div class="row">
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">📊</div>
+                        <small>Activity Distribution</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">🏃‍♂️</div>
+                        <small>Running Miles</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">🚶‍♂️</div>
+                        <small>Walking Miles</small>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div class="mb-2">💓</div>
+                        <small>HR Zone Analysis</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set default dates (last 30 days)
+document.addEventListener('DOMContentLoaded', function() {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - 30);
+    
+    document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+    document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}

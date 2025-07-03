@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <h2 class="card-title mb-4">Welcome to Strava Stats</h2>
+                <p class="card-text mb-4">
+                    Connect your Strava account to analyze your activities and get detailed insights about your workouts.
+                </p>
+                <div class="mb-4">
+                    <i class="fas fa-chart-pie fa-3x text-primary mb-3"></i>
+                    <h5>Features:</h5>
+                    <ul class="list-unstyled">
+                        <li>📊 Activity type distribution</li>
+                        <li>🏃‍♂️ Running & walking mileage</li>
+                        <li>🔥 Calories burned analysis</li>
+                        <li>💓 Heart rate zone breakdown</li>
+                    </ul>
+                </div>
+                <a href="{{ auth_url }}" class="btn btn-primary btn-lg">
+                    <img src="https://developers.strava.com/images/btn_strava_connectwith_orange.svg" 
+                         alt="Connect with Strava" style="height: 48px;">
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

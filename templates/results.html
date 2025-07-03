@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if message %}
+    <div class="alert alert-info">{{ message }}</div>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">← Back to Dashboard</a>
+{% else %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Activity Analysis Results</h2>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-primary">← New Analysis</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 data-bs-title="Total number of activities in the selected date range"
+                 style="cursor: help;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ analysis.total_activities }}</h3>
+                    <p class="card-text">
+                        Total Activities 
+                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 data-bs-title="Total distance covered in running activities (includes virtual runs)"
+                 style="cursor: help;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ analysis.running_miles }}</h3>
+                    <p class="card-text">
+                        Running Miles 
+                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 data-bs-title="Total distance covered in walking and hiking activities"
+                 style="cursor: help;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ analysis.walking_miles }}</h3>
+                    <p class="card-text">
+                        Walking Miles 
+                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card position-relative" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 data-bs-html="true"
+                 data-bs-title="<strong>Calories Calculation:</strong><br>
+                               {% if analysis.calories_estimated %}
+                               🔸 <strong>Estimated</strong> based on activity type & duration<br>
+                               • Running: 12 cal/min<br>
+                               • Cycling: 8 cal/min<br>
+                               • Walking: 4 cal/min<br>
+                               • Swimming: 10 cal/min<br>
+                               • Weight Training: 6 cal/min<br>
+                               • Other activities: 8 cal/min
+                               {% else %}
+                               🔸 <strong>From Strava Data</strong><br>
+                               Actual calories recorded by your devices
+                               {% endif %}"
+                 style="cursor: help;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">
+                        {% if analysis.total_calories %}
+                            {{ "{:,}".format(analysis.total_calories) }}
+                            {% if analysis.calories_estimated %}
+                                <small class="d-block" style="font-size: 0.6em; opacity: 0.8;">*estimated</small>
+                            {% endif %}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </h3>
+                    <p class="card-text">
+                        Calories Burned 
+                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Distribution Chart -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Activity Types Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div id="activity-pie-chart"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Activity Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    {% for activity_type, count in analysis.activity_breakdown.items() %}
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>{{ activity_type }}</span>
+                            <span class="badge bg-primary">{{ count }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Heart Rate Zones -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Heart Rate Zone Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for zone, percentage in analysis.zone_analysis.items() %}
+                            <div class="col-md-2">
+                                <div class="card zone-card mb-2">
+                                    <div class="card-body text-center p-2">
+                                        <h6 class="card-title mb-1">{{ percentage }}%</h6>
+                                        <small>{{ zone }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <strong>Note:</strong> Heart rate zone data is estimated based on typical distributions. 
+                            For precise zone analysis, ensure your activities include heart rate data.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Insights -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Key Insights</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            🏃‍♂️ <strong>Total Distance:</strong> 
+                            {{ "%.2f"|format(analysis.running_miles + analysis.walking_miles) }} miles 
+                            ({{ analysis.running_miles }} running + {{ analysis.walking_miles }} walking)
+                        </li>
+                        <li class="mb-2">
+                            📊 <strong>Most Common Activity:</strong> 
+                            {{ analysis.activity_breakdown.keys() | list | first }}
+                        </li>
+                        {% if analysis.total_calories %}
+                        <li class="mb-2">
+                            🔥 <strong>Calories Burned:</strong> 
+                            {{ "{:,}".format(analysis.total_calories) }} calories
+                            {% if analysis.calories_estimated %}
+                                (estimated based on activity type and duration)
+                            {% else %}
+                                (from Strava data)
+                            {% endif %}
+                        </li>
+                        {% endif %}
+                        <li class="mb-2">
+                            💓 <strong>Training Focus:</strong> 
+                            {% if analysis.zone_analysis['Zone 2 (Aerobic)'] > 30 %}
+                                Aerobic base building
+                            {% elif analysis.zone_analysis['Zone 4 (Threshold)'] > 20 %}
+                                High-intensity training
+                            {% else %}
+                                Balanced training approach
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+{% if analysis %}
+    // Render the pie chart
+    var pieChartData = {{ analysis.pie_chart | safe }};
+    Plotly.newPlot('activity-pie-chart', pieChartData.data, pieChartData.layout, {responsive: true});
+{% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,8 @@
+flask==2.3.3
+requests==2.31.0
+python-dotenv==1.0.0
+matplotlib==3.7.2
+pandas==1.5.3
+numpy==1.24.3
+plotly==5.17.0
+stravalib==1.4.0
