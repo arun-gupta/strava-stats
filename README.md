@@ -201,4 +201,6 @@ To extend the application:
 
 ## License
 
-This project is for educational purposes. Please respect Strava's API terms of service and rate limits.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+Please respect Strava's API terms of service and rate limits when using this application.
