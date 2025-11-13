@@ -1,11 +1,11 @@
 # Strava Stats Web Application
 
-A Python Flask web application that connects to your Strava account and provides detailed analytics about your activities including activity type distribution, time distribution, running distance analysis, elevation tracking, and heart rate zone analysis.
+A Python Flask web application that connects to your Strava account and provides detailed analytics about your activities including activity type distribution, time distribution, running distance analysis, elevation tracking, and pace trends.
 
 ## Features
 
 - 🔐 Secure Strava OAuth authentication
-- 📊 Interactive tabbed charts with 6 views:
+- 📊 Interactive tabbed charts with 5 views:
   - **Activity Count Distribution**: Pie chart showing activity types with counts and percentages
   - **Time Distribution**: Pie chart showing time spent on each activity type (formatted as hours and minutes)
   - **Run Distance Distribution**: Bar chart with 1-mile bins + running summary card showing:
@@ -13,9 +13,8 @@ A Python Flask web application that connects to your Strava account and provides
     - 10K+ Runs (6.2 miles or longer)
     - Average Pace (in MM:SS format per mile)
     - Total Miles
-  - **Heart Rate Zones**: Color-coded zones from green (recovery) to red (anaerobic)
   - **Mileage Trend**: Toggle between Daily, Weekly, Monthly running mileage with proper time-series display
-  - **Pace Trend**: Toggle between Daily, Weekly, Monthly average pace with reversed Y-axis (faster at top)
+  - **Pace Trend**: Toggle between Daily, Weekly, Monthly average pace with continuous line showing rest days at zero
 - 📈 Advanced visualizations:
   - Weekly charts show week numbers and start dates on X-axis
   - Monthly charts show month names on X-axis
@@ -167,16 +166,14 @@ The application will be available at `http://localhost:3000`
    - **Time Distribution**: Pie chart showing time spent per activity type in hours and minutes format
    - **Run Distance Distribution**:
      - Bar chart with 1-mile distance bins
-     - Running summary card with total runs, 10K+ runs count, average pace, and total miles
-     - Highlighted banner for runs 10K (6.2 miles) or longer
-   - **Heart Rate Zone Analysis**: Color-coded zones from green (recovery) to red (anaerobic)
+     - Running summary card with total runs, 10K+ runs count, total miles, and average pace
    - **Mileage Trend**: Interactive charts showing daily/weekly/monthly running mileage
      - Weekly view shows week numbers and start dates
      - Monthly view shows month names (e.g., "Jan 2024")
    - **Pace Trend**: Interactive charts showing daily/weekly/monthly average pace
      - Pace displayed in MM:SS format (e.g., "9:30" per mile)
-     - Y-axis reversed so faster pace appears at top
-     - Hover tooltips show week numbers and date ranges
+     - Daily view shows continuous line dropping to 0 on rest days
+     - Hover tooltips show week numbers and date ranges for weekly/monthly views
 
 ## API Rate Limits
 

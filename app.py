@@ -87,17 +87,6 @@ class StravaAPI:
                 break
         
         return activities
-    
-    def get_activity_zones(self, access_token, activity_id):
-        """Get heart rate zones for a specific activity"""
-        headers = {'Authorization': f'Bearer {access_token}'}
-        
-        response = requests.get(f'{self.base_url}/activities/{activity_id}/zones',
-                              headers=headers)
-        
-        if response.status_code == 200:
-            return response.json()
-        return None
 
 strava_api = StravaAPI()
 
@@ -275,9 +264,6 @@ def process_activities(activities, access_token):
     # Calculate total elevation gain
     total_elevation = df['total_elevation_gain'].sum() if 'total_elevation_gain' in df.columns else 0
     total_elevation_feet = total_elevation * 3.28084  # Convert meters to feet
-
-    # Heart rate zones analysis (simplified - would need detailed API calls for each activity)
-    zone_analysis = analyze_heart_rate_zones(activities, access_token)
 
     # ==============================
     # Mileage trend (daily/weekly/monthly)
@@ -555,7 +541,6 @@ def process_activities(activities, access_token):
         'runs_10k_plus': runs_10k_plus,
         'total_runs': total_runs,
         'avg_pace_formatted': avg_pace_formatted,
-        'zone_analysis': zone_analysis,
         'mileage_trend_daily': mileage_trend_daily_json,
         'mileage_trend_weekly': mileage_trend_weekly_json,
         'mileage_trend_monthly': mileage_trend_monthly_json,
@@ -563,33 +548,6 @@ def process_activities(activities, access_token):
         'pace_trend_weekly': pace_trend_weekly_json,
         'pace_trend_monthly': pace_trend_monthly_json
     }
-
-def analyze_heart_rate_zones(activities, access_token):
-    """Analyze heart rate zones across activities"""
-    # This is a simplified version - in practice, you'd need to make API calls
-    # for each activity to get detailed zone data
-    zone_data = {
-        'Zone 1 (Recovery)': 0,
-        'Zone 2 (Aerobic)': 0,
-        'Zone 3 (Tempo)': 0,
-        'Zone 4 (Threshold)': 0,
-        'Zone 5 (Anaerobic)': 0
-    }
-    
-    # Sample zone distribution (you would calculate this from actual zone data)
-    total_time = sum(activity.get('moving_time', 0) for activity in activities)
-    
-    if total_time > 0:
-        # Simplified zone distribution - replace with actual API calls
-        zone_data = {
-            'Zone 1 (Recovery)': 25,
-            'Zone 2 (Aerobic)': 35,
-            'Zone 3 (Tempo)': 20,
-            'Zone 4 (Threshold)': 15,
-            'Zone 5 (Anaerobic)': 5
-        }
-    
-    return zone_data
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=STRAVA_PORT)

@@ -120,11 +120,6 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="hr-zone-tab" data-bs-toggle="tab" data-bs-target="#hr-zone-chart" type="button" role="tab" aria-controls="hr-zone-chart" aria-selected="false">
-                                Heart Rate Zones
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
                             <button class="nav-link" id="mileage-trend-tab" data-bs-toggle="tab" data-bs-target="#mileage-trend" type="button" role="tab" aria-controls="mileage-trend" aria-selected="false">
                                 Mileage Trend
                             </button>
@@ -149,13 +144,6 @@
                             <div class="row">
                                 <div class="col-md-8">
                                     <div id="run-distance-chart"></div>
-                                    {% if analysis.runs_10k_plus > 0 %}
-                                    <div class="mt-3 d-flex justify-content-center">
-                                        <div class="alert alert-success shadow-sm" role="alert" style="border-left: 5px solid #28a745; font-size: 1.25rem; max-width: 500px;">
-                                            <strong>🏃 {{ analysis.runs_10k_plus }}</strong> runs of <strong>10K (6.2 miles) or longer</strong>
-                                        </div>
-                                    </div>
-                                    {% endif %}
                                 </div>
                                 <div class="col-md-4">
                                     <div class="card shadow-sm h-100">
@@ -172,12 +160,12 @@
                                                 <small class="text-muted">10K+ Runs</small>
                                             </div>
                                             <div class="mb-4">
-                                                <h2 class="text-info mb-0">{{ analysis.avg_pace_formatted }}</h2>
-                                                <small class="text-muted">Avg Pace (/mi)</small>
-                                            </div>
-                                            <div>
                                                 <h2 class="text-warning mb-0">{{ analysis.running_miles }}</h2>
                                                 <small class="text-muted">Total Miles</small>
+                                            </div>
+                                            <div>
+                                                <h2 class="text-info mb-0">{{ analysis.avg_pace_formatted }}</h2>
+                                                <small class="text-muted">Avg Pace (/mi)</small>
                                             </div>
                                         </div>
                                     </div>
@@ -186,33 +174,6 @@
                             {% else %}
                             <p class="text-muted text-center">No running activities found</p>
                             {% endif %}
-                        </div>
-                        <div class="tab-pane fade" id="hr-zone-chart" role="tabpanel" aria-labelledby="hr-zone-tab">
-                            <div class="row">
-                                {% set zone_colors = {
-                                    'Zone 1 (Recovery)': '#28a745',
-                                    'Zone 2 (Aerobic)': '#7ed321',
-                                    'Zone 3 (Tempo)': '#ffc107',
-                                    'Zone 4 (Threshold)': '#fd7e14',
-                                    'Zone 5 (Anaerobic)': '#dc3545'
-                                } %}
-                                {% for zone, percentage in analysis.zone_analysis.items() %}
-                                    <div class="col-md-2">
-                                        <div class="card zone-card mb-2" style="background-color: {{ zone_colors.get(zone, '#6c757d') }} !important; color: white !important; border: none !important;">
-                                            <div class="card-body text-center p-2">
-                                                <h6 class="card-title mb-1" style="color: white !important;">{{ percentage }}%</h6>
-                                                <small style="color: white !important;">{{ zone }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                            <div class="mt-3">
-                                <small class="text-muted">
-                                    <strong>Note:</strong> Heart rate zone data is estimated based on typical distributions.
-                                    For precise zone analysis, ensure your activities include heart rate data.
-                                </small>
-                            </div>
                         </div>
                         <div class="tab-pane fade" id="mileage-trend" role="tabpanel" aria-labelledby="mileage-trend-tab">
                             {% if analysis.mileage_trend_daily %}
