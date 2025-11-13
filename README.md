@@ -17,7 +17,24 @@ A Python Flask web application that connects to your Strava account and provides
 - 📅 Custom date range selection
 - 📱 Responsive web interface
 
-## Setup Instructions
+## Quick Start
+
+For a streamlined setup experience, use the quickstart script:
+
+```bash
+./quickstart.sh
+```
+
+The script will:
+1. Check if `.env` file exists (creates from template if not)
+2. Validate environment variables
+3. Create virtual environment if needed
+4. Install all dependencies
+5. Start the application
+
+**Note:** You'll need to configure your `.env` file with Strava credentials before the app can run.
+
+## Manual Setup Instructions
 
 ### 1. Create a Strava Application
 
