@@ -252,18 +252,36 @@ def process_activities(activities, access_token):
         labels=list(duration_by_type.index),
         values=list(duration_by_type.values / 3600),  # Convert to hours
         hole=0.3,
-        texttemplate='%{label}<br>%{value:.1f}h',
+        texttemplate='%{label}<br>%{value:.1f}h (%{percent})',
         textposition='auto'
     )])
     duration_pie_chart.update_layout(title="Time Distribution by Activity Type")
     duration_pie_chart_json = json.dumps(duration_pie_chart, cls=plotly.utils.PlotlyJSONEncoder)
 
-    # Calculate running and walking stats
-    running_activities = df[df['type'].isin(['Run', 'VirtualRun'])]
-    walking_activities = df[df['type'] == 'Walk']
+    # Calculate running stats and distance distribution
+    running_activities = df[df['type'] == 'Run']
 
     running_distance = running_activities['distance'].sum() / 1609.34 if not running_activities.empty else 0
-    walking_distance = walking_activities['distance'].sum() / 1609.34 if not walking_activities.empty else 0
+
+    # Create running distance distribution (group by mile ranges)
+    run_distance_distribution = {}
+    if not running_activities.empty:
+        running_distances_miles = running_activities['distance'] / 1609.34
+
+        # Define distance bins (in miles)
+        bins = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, float('inf')]
+        labels = ['0-1', '1-2', '2-3', '3-4', '4-5', '5-6', '6-7', '7-8', '8-9', '9-10', '10+']
+
+        # Categorize runs into bins
+        distance_categories = pd.cut(running_distances_miles, bins=bins, labels=labels, right=False)
+        run_distance_distribution = distance_categories.value_counts().sort_index().to_dict()
+
+        print("Run distance distribution:", run_distance_distribution)
+
+    # Calculate total elevation gain
+    total_elevation = df['total_elevation_gain'].sum() if 'total_elevation_gain' in df.columns else 0
+    total_elevation_feet = total_elevation * 3.28084  # Convert meters to feet
+    print(f"Total elevation: {total_elevation_feet:.2f} feet")
 
     # Heart rate zones analysis (simplified - would need detailed API calls for each activity)
     zone_analysis = analyze_heart_rate_zones(activities, access_token)
@@ -273,9 +291,10 @@ def process_activities(activities, access_token):
         'duration_pie_chart': duration_pie_chart_json,
         'total_activities': len(activities),
         'running_miles': round(running_distance, 2),
-        'walking_miles': round(walking_distance, 2),
+        'total_elevation_feet': round(total_elevation_feet, 2),
         'total_duration_hours': round(total_duration_hours, 2),
         'activity_breakdown': activity_counts.to_dict(),
+        'run_distance_distribution': run_distance_distribution,
         'zone_analysis': zone_analysis
     }
 

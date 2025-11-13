@@ -13,13 +13,7 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2>Activity Analysis Results</h2>
-                    <div class="text-muted">
-                        <i class="fas fa-calendar-alt"></i> 
-                        <strong>Analysis Period:</strong> {{ analysis.date_range_formatted }}
-                    </div>
-                </div>
+                <h2>Activity Analysis Results</h2>
                 <a href="{{ url_for('index') }}" class="btn btn-outline-primary">← New Analysis</a>
             </div>
         </div>
@@ -43,45 +37,15 @@
     <!-- Summary Stats -->
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card stat-card" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 data-bs-title="Total number of activities in the selected date range"
+            <div class="card stat-card"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Most frequently performed activity type"
                  style="cursor: help;">
                 <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.total_activities }}</h3>
+                    <h3 class="card-title">{{ analysis.activity_breakdown.keys() | list | first }}</h3>
                     <p class="card-text">
-                        Total Activities 
-                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stat-card" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 data-bs-title="Total distance covered in running activities (includes virtual runs)"
-                 style="cursor: help;">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.running_miles }}</h3>
-                    <p class="card-text">
-                        Running Miles 
-                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stat-card" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 data-bs-title="Total distance covered in walking and hiking activities"
-                 style="cursor: help;">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.walking_miles }}</h3>
-                    <p class="card-text">
-                        Walking Miles 
+                        Most Common Activity
                         <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
                     </p>
                 </div>
@@ -97,6 +61,36 @@
                     <h3 class="card-title">{{ analysis.total_duration_hours }}</h3>
                     <p class="card-text">
                         Total Hours
+                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Total distance covered in running activities"
+                 style="cursor: help;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ analysis.running_miles }}</h3>
+                    <p class="card-text">
+                        Running Miles
+                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Total elevation gained across all activities"
+                 style="cursor: help;">
+                <div class="card-body text-center">
+                    <h3 class="card-title">{{ analysis.total_elevation_feet }}</h3>
+                    <p class="card-text">
+                        Elevation (ft)
                         <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
                     </p>
                 </div>
@@ -120,6 +114,16 @@
                                 Time
                             </button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="distance-tab" data-bs-toggle="tab" data-bs-target="#distance-chart" type="button" role="tab" aria-controls="distance-chart" aria-selected="false">
+                                Run Distribution
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="hr-zone-tab" data-bs-toggle="tab" data-bs-target="#hr-zone-chart" type="button" role="tab" aria-controls="hr-zone-chart" aria-selected="false">
+                                Heart Rate Zones
+                            </button>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-body">
@@ -129,6 +133,42 @@
                         </div>
                         <div class="tab-pane fade" id="duration-chart" role="tabpanel" aria-labelledby="duration-tab">
                             <div id="duration-pie-chart"></div>
+                        </div>
+                        <div class="tab-pane fade" id="distance-chart" role="tabpanel" aria-labelledby="distance-tab">
+                            {% if analysis.run_distance_distribution %}
+                            <div id="run-distance-chart"></div>
+                            <div class="mt-3 text-center">
+                                <span class="badge bg-success fs-5">
+                                    {% if analysis.run_distance_distribution.get('6-7', 0) > 0 %}
+                                        {{ analysis.run_distance_distribution['6-7'] }} x 10K runs (6.2 miles)
+                                    {% else %}
+                                        No 10K runs
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center">No running activities found</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="hr-zone-chart" role="tabpanel" aria-labelledby="hr-zone-tab">
+                            <div class="row">
+                                {% for zone, percentage in analysis.zone_analysis.items() %}
+                                    <div class="col-md-2">
+                                        <div class="card zone-card mb-2">
+                                            <div class="card-body text-center p-2">
+                                                <h6 class="card-title mb-1">{{ percentage }}%</h6>
+                                                <small>{{ zone }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <strong>Note:</strong> Heart rate zone data is estimated based on typical distributions.
+                                    For precise zone analysis, ensure your activities include heart rate data.
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,98 +181,6 @@
         </div>
     </div>
 
-    <!-- Activity Breakdown -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Activity Breakdown</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% for activity_type, count in analysis.activity_breakdown.items() %}
-                            <div class="col-md-3 mb-2">
-                                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
-                                    <span>{{ activity_type }}</span>
-                                    <span class="badge bg-primary">{{ count }}</span>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Heart Rate Zones -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Heart Rate Zone Distribution</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% for zone, percentage in analysis.zone_analysis.items() %}
-                            <div class="col-md-2">
-                                <div class="card zone-card mb-2">
-                                    <div class="card-body text-center p-2">
-                                        <h6 class="card-title mb-1">{{ percentage }}%</h6>
-                                        <small>{{ zone }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    <div class="mt-3">
-                        <small class="text-muted">
-                            <strong>Note:</strong> Heart rate zone data is estimated based on typical distributions. 
-                            For precise zone analysis, ensure your activities include heart rate data.
-                        </small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Additional Insights -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">Key Insights</h5>
-                    <small class="text-muted">Based on activities from {{ analysis.date_range_formatted }}</small>
-                </div>
-                <div class="card-body">
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            🏃‍♂️ <strong>Total Distance:</strong> 
-                            {{ "%.2f"|format(analysis.running_miles + analysis.walking_miles) }} miles 
-                            ({{ analysis.running_miles }} running + {{ analysis.walking_miles }} walking)
-                        </li>
-                        <li class="mb-2">
-                            📊 <strong>Most Common Activity:</strong>
-                            {{ analysis.activity_breakdown.keys() | list | first }}
-                        </li>
-                        <li class="mb-2">
-                            ⏱️ <strong>Total Time:</strong>
-                            {{ analysis.total_duration_hours }} hours
-                        </li>
-                        <li class="mb-2">
-                            💓 <strong>Training Focus:</strong> 
-                            {% if analysis.zone_analysis['Zone 2 (Aerobic)'] > 30 %}
-                                Aerobic base building
-                            {% elif analysis.zone_analysis['Zone 4 (Threshold)'] > 20 %}
-                                High-intensity training
-                            {% else %}
-                                Balanced training approach
-                            {% endif %}
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
 {% endif %}
 
 <script>
@@ -244,6 +192,30 @@
     // Render the duration pie chart
     var durationChartData = {{ analysis.duration_pie_chart | safe }};
     Plotly.newPlot('duration-pie-chart', durationChartData.data, durationChartData.layout, {responsive: true});
+
+    // Render the run distance distribution bar chart
+    {% if analysis.run_distance_distribution %}
+    var runDistanceData = {{ analysis.run_distance_distribution | tojson }};
+    var distanceLabels = Object.keys(runDistanceData);
+    var distanceCounts = Object.values(runDistanceData);
+
+    var barChart = {
+        x: distanceLabels,
+        y: distanceCounts,
+        type: 'bar',
+        marker: {
+            color: '#667eea'
+        }
+    };
+
+    var barLayout = {
+        title: 'Run Distance Distribution (miles)',
+        xaxis: { title: 'Distance Range (miles)' },
+        yaxis: { title: 'Number of Runs' }
+    };
+
+    Plotly.newPlot('run-distance-chart', [barChart], barLayout, {responsive: true});
+    {% endif %}
 {% endif %}
 </script>
 {% endblock %}
