@@ -19,20 +19,33 @@ A Python Flask web application that connects to your Strava account and provides
 
 ## Quick Start
 
-For a streamlined setup experience, use the quickstart script:
+Get up and running in 3 steps:
 
-```bash
-./quickstart.sh
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/arun-gupta/strava-stats.git
+   cd strava-stats
+   ```
 
-The script will:
-1. Check if `.env` file exists (creates from template if not)
-2. Validate environment variables
-3. Create virtual environment if needed
-4. Install all dependencies
-5. Start the application
+2. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Strava credentials
+   # Generate FLASK_SECRET_KEY: python3 -c "import secrets; print(secrets.token_hex(32))"
+   ```
 
-**Note:** You'll need to configure your `.env` file with Strava credentials before the app can run.
+3. **Run the quickstart script**
+   ```bash
+   ./quickstart.sh
+   ```
+
+That's it! The application will be available at `http://localhost:3000`
+
+The quickstart script automatically:
+- Creates virtual environment
+- Installs all dependencies
+- Validates configuration
+- Starts the application
 
 ## Manual Setup Instructions
 
