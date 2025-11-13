@@ -412,49 +412,56 @@ def process_activities(activities, access_token):
                     secs = int(pace_seconds % 60)
                     return f"{mins}:{secs:02d}"
 
-                # Daily average pace
-                daily_pace = (ra['pace_sec_per_mi']
-                             .groupby(pd.Grouper(freq='D'))
-                             .mean()
-                             .reindex(daily_index, fill_value=0))
-                daily_pace = daily_pace[daily_pace > 0]
+                # Daily average pace - create complete dataset with all days
+                # Group by date and calculate mean pace, normalizing the index
+                daily_pace_with_runs = ra['pace_sec_per_mi'].groupby(ra.index.normalize()).mean()
 
-                x_daily_pace = [d.strftime('%Y-%m-%d') for d in daily_pace.index]
-                y_daily_pace = [float(v) for v in daily_pace.values]
+                # Now create complete lists for ALL days in the range
+                x_daily_pace = []
+                y_daily_pace = []
+                hover_text_daily_pace = []
+
+                for date in daily_index:
+                    x_daily_pace.append(date)
+
+                    if date in daily_pace_with_runs.index:
+                        pace = daily_pace_with_runs[date]
+                        y_daily_pace.append(float(pace))
+                        hover_text_daily_pace.append(f"{date.strftime('%b %d')}<br>Pace: {pace_to_mmss(pace)}")
+                    else:
+                        y_daily_pace.append(0.0)  # Explicitly 0.0 for non-running days
+                        hover_text_daily_pace.append(f"{date.strftime('%b %d')}<br>No run")
 
                 daily_pace_fig = go.Figure([
                     go.Scatter(
                         x=x_daily_pace,
                         y=y_daily_pace,
                         mode='lines+markers',
-                        line=dict(color="#e15759"),
-                        marker=dict(size=6),
-                        hovertemplate='%{x|%Y-%m-%d}<br>Pace: ' +
-                                     '<br>'.join([pace_to_mmss(p) for p in y_daily_pace]) +
-                                     '<extra></extra>',
-                        customdata=[pace_to_mmss(p) for p in y_daily_pace]
+                        line=dict(color="#e15759", width=2),
+                        marker=dict(size=5, symbol='circle'),
+                        text=hover_text_daily_pace,
+                        hovertemplate='%{text}<extra></extra>'
                     )
                 ])
-
-                # Custom hover template
-                daily_pace_fig.update_traces(
-                    hovertemplate='%{x|%Y-%m-%d}<br>Pace: %{customdata}<extra></extra>'
-                )
 
                 daily_pace_fig.update_layout(
                     title="Daily Average Pace",
                     xaxis_title="Day",
-                    yaxis_title="Pace (seconds per mile)",
+                    yaxis_title="Pace (min/mile)",
                     yaxis=dict(
-                        autorange='reversed',
+                        rangemode='tozero',
                         tickmode='array',
-                        tickvals=[i * 60 for i in range(6, 15)],
-                        ticktext=[f"{i}:00" for i in range(6, 15)]
+                        tickvals=[0] + [i * 60 for i in range(6, 15)],
+                        ticktext=['0:00'] + [f"{i}:00" for i in range(6, 15)]
                     ),
                     xaxis=dict(
-                        dtick="D1",
-                        tickformat="%b %d"
-                    )
+                        type='date',
+                        tickformat='%b %d',
+                        tickangle=-45,
+                        dtick=86400000,  # 1 day in milliseconds - show every day
+                        range=[daily_index[0], daily_index[-1]]  # Ensure full range is shown
+                    ),
+                    hovermode='x unified'
                 )
                 pace_trend_daily_json = json.dumps(daily_pace_fig, cls=plotly.utils.PlotlyJSONEncoder)
 
@@ -485,7 +492,7 @@ def process_activities(activities, access_token):
                 weekly_pace_fig.update_layout(
                     title="Weekly Average Pace",
                     xaxis_title="Week Start Date",
-                    yaxis_title="Pace (seconds per mile)",
+                    yaxis_title="Pace (min/mile)",
                     yaxis=dict(
                         autorange='reversed',  # Lower pace (faster) at top
                         tickmode='array',
@@ -521,7 +528,7 @@ def process_activities(activities, access_token):
                 monthly_pace_fig.update_layout(
                     title="Monthly Average Pace",
                     xaxis_title="Month",
-                    yaxis_title="Pace (seconds per mile)",
+                    yaxis_title="Pace (min/mile)",
                     yaxis=dict(
                         autorange='reversed',  # Lower pace (faster) at top
                         tickmode='array',
