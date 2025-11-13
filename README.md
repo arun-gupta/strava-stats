@@ -22,7 +22,7 @@ A Python Flask web application that connects to your Strava account and provides
    - **Application Name**: Strava Stats
    - **Category**: Data Importer
    - **Club**: Leave blank
-   - **Website**: http://localhost:5000
+   - **Website**: http://localhost:3000
    - **Authorization Callback Domain**: localhost
 4. Note down your **Client ID** and **Client Secret**
 
@@ -77,10 +77,17 @@ FLASK_SECRET_KEY=your_generated_secret_key_here
 
 **With virtual environment activated:**
 ```bash
+./run.sh
+```
+
+**Or manually:**
+```bash
 python app.py
 ```
 
-The application will be available at `http://localhost:5000`
+**Note:** The `run.sh` script automatically stops any existing Flask processes before starting a new one.
+
+The application will be available at `http://localhost:3000`
 
 ## Usage
 

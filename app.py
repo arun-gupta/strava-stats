@@ -14,10 +14,16 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-change-this')
 
+# Configure session to be less restrictive for localhost development
+app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+
 # Strava API configuration
 STRAVA_CLIENT_ID = os.getenv('STRAVA_CLIENT_ID')
 STRAVA_CLIENT_SECRET = os.getenv('STRAVA_CLIENT_SECRET')
-STRAVA_REDIRECT_URI = 'http://localhost:5000/callback'
+STRAVA_PORT = int(os.getenv('FLASK_PORT', '3000'))
+STRAVA_REDIRECT_URI = f'http://localhost:{STRAVA_PORT}/callback'
 
 class StravaAPI:
     def __init__(self):
@@ -105,18 +111,35 @@ def index():
 @app.route('/callback')
 def callback():
     """Handle Strava OAuth callback"""
+    print("=" * 50)
+    print("CALLBACK ROUTE HIT!")
+    print(f"Request args: {request.args}")
+    print(f"Full URL: {request.url}")
+    print("=" * 50)
+
     code = request.args.get('code')
+    error = request.args.get('error')
+
+    if error:
+        print(f"OAuth error: {error}")
+        return f"Authentication error: {error}", 400
+
     if not code:
+        print("No code received")
         return redirect(url_for('index'))
-    
+
+    print(f"Exchanging code: {code[:10]}...")
     token_data = strava_api.exchange_code_for_token(code)
-    
+    print(f"Token response: {token_data}")
+
     if 'access_token' in token_data:
         session['access_token'] = token_data['access_token']
         session['athlete'] = token_data['athlete']
+        print("Authentication successful!")
         return redirect(url_for('index'))
-    
-    return "Authentication failed", 400
+
+    print("Authentication failed - no access token")
+    return f"Authentication failed: {token_data}", 400
 
 @app.route('/logout')
 def logout():
@@ -292,4 +315,4 @@ def analyze_heart_rate_zones(activities, access_token):
     return zone_data
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host='0.0.0.0', port=STRAVA_PORT)
