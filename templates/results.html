@@ -55,12 +55,12 @@
             <div class="card stat-card"
                  data-bs-toggle="tooltip"
                  data-bs-placement="top"
-                 data-bs-title="Total time spent across all activities (moving time)"
+                 data-bs-title="Total distance covered in running activities"
                  style="cursor: help;">
                 <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.total_duration_hours }}</h3>
+                    <h3 class="card-title">{{ analysis.running_miles }}</h3>
                     <p class="card-text">
-                        Total Hours
+                        Running Miles
                         <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
                     </p>
                 </div>
@@ -70,12 +70,12 @@
             <div class="card stat-card"
                  data-bs-toggle="tooltip"
                  data-bs-placement="top"
-                 data-bs-title="Total distance covered in running activities"
+                 data-bs-title="Total time spent across all activities (moving time)"
                  style="cursor: help;">
                 <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.running_miles }}</h3>
+                    <h3 class="card-title">{{ analysis.total_duration_formatted }}</h3>
                     <p class="card-text">
-                        Running Miles
+                        Time
                         <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
                     </p>
                 </div>
@@ -124,6 +124,16 @@
                                 Heart Rate Zones
                             </button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="mileage-trend-tab" data-bs-toggle="tab" data-bs-target="#mileage-trend" type="button" role="tab" aria-controls="mileage-trend" aria-selected="false">
+                                Mileage Trend
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="pace-trend-tab" data-bs-toggle="tab" data-bs-target="#pace-trend" type="button" role="tab" aria-controls="pace-trend" aria-selected="false">
+                                Pace Trend
+                            </button>
+                        </li>
                     </ul>
                 </div>
                 <div class="card-body">
@@ -136,15 +146,42 @@
                         </div>
                         <div class="tab-pane fade" id="distance-chart" role="tabpanel" aria-labelledby="distance-tab">
                             {% if analysis.run_distance_distribution %}
-                            <div id="run-distance-chart"></div>
-                            <div class="mt-3 text-center">
-                                <span class="badge bg-success fs-5">
-                                    {% if analysis.run_distance_distribution.get('6-7', 0) > 0 %}
-                                        {{ analysis.run_distance_distribution['6-7'] }} x 10K runs (6.2 miles)
-                                    {% else %}
-                                        No 10K runs
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div id="run-distance-chart"></div>
+                                    {% if analysis.runs_10k_plus > 0 %}
+                                    <div class="mt-3 d-flex justify-content-center">
+                                        <div class="alert alert-success shadow-sm" role="alert" style="border-left: 5px solid #28a745; font-size: 1.25rem; max-width: 500px;">
+                                            <strong>🏃 {{ analysis.runs_10k_plus }}</strong> runs of <strong>10K (6.2 miles) or longer</strong>
+                                        </div>
+                                    </div>
                                     {% endif %}
-                                </span>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card shadow-sm h-100">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">Running Summary</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="mb-4">
+                                                <h2 class="text-primary mb-0">{{ analysis.total_runs }}</h2>
+                                                <small class="text-muted">Total Runs</small>
+                                            </div>
+                                            <div class="mb-4">
+                                                <h2 class="text-success mb-0">{{ analysis.runs_10k_plus }}</h2>
+                                                <small class="text-muted">10K+ Runs</small>
+                                            </div>
+                                            <div class="mb-4">
+                                                <h2 class="text-info mb-0">{{ analysis.avg_pace_formatted }}</h2>
+                                                <small class="text-muted">Avg Pace (/mi)</small>
+                                            </div>
+                                            <div>
+                                                <h2 class="text-warning mb-0">{{ analysis.running_miles }}</h2>
+                                                <small class="text-muted">Total Miles</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             {% else %}
                             <p class="text-muted text-center">No running activities found</p>
@@ -176,6 +213,40 @@
                                     For precise zone analysis, ensure your activities include heart rate data.
                                 </small>
                             </div>
+                        </div>
+                        <div class="tab-pane fade" id="mileage-trend" role="tabpanel" aria-labelledby="mileage-trend-tab">
+                            {% if analysis.mileage_trend_daily %}
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="btn-group" role="group" aria-label="Mileage granularity">
+                                    <button type="button" class="btn btn-outline-primary active" id="btn-daily">Daily</button>
+                                    <button type="button" class="btn btn-outline-primary" id="btn-weekly">Weekly</button>
+                                    <button type="button" class="btn btn-outline-primary" id="btn-monthly">Monthly</button>
+                                </div>
+                            </div>
+                            <div id="mileage-trend-chart"></div>
+                            <div class="mt-2 text-center">
+                                <small class="text-muted">Shows per-period totals (not cumulative).</small>
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center">No running activities found to compute mileage trend.</p>
+                            {% endif %}
+                        </div>
+                        <div class="tab-pane fade" id="pace-trend" role="tabpanel" aria-labelledby="pace-trend-tab">
+                            {% if analysis.pace_trend_daily %}
+                            <div class="d-flex justify-content-center mb-3">
+                                <div class="btn-group" role="group" aria-label="Pace granularity">
+                                    <button type="button" class="btn btn-outline-primary active" id="btn-pace-daily">Daily</button>
+                                    <button type="button" class="btn btn-outline-primary" id="btn-pace-weekly">Weekly</button>
+                                    <button type="button" class="btn btn-outline-primary" id="btn-pace-monthly">Monthly</button>
+                                </div>
+                            </div>
+                            <div id="pace-trend-chart"></div>
+                            <div class="mt-2 text-center">
+                                <small class="text-muted">Shows average pace per period. Lower values indicate faster pace.</small>
+                            </div>
+                            {% else %}
+                            <p class="text-muted text-center">No running activities found to compute pace trend.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -222,6 +293,58 @@
     };
 
     Plotly.newPlot('run-distance-chart', [barChart], barLayout, {responsive: true});
+    {% endif %}
+
+    // Render the mileage trend charts (toggle between daily/weekly/monthly)
+    {% if analysis.mileage_trend_daily %}
+    var mileageDaily = {{ analysis.mileage_trend_daily | safe }};
+    var mileageWeekly = {{ analysis.mileage_trend_weekly | safe }};
+    var mileageMonthly = {{ analysis.mileage_trend_monthly | safe }};
+
+    function showMileage(figJson) {
+        Plotly.newPlot('mileage-trend-chart', figJson.data, figJson.layout, {responsive: true});
+    }
+    // default: daily
+    showMileage(mileageDaily);
+
+    function setActive(btnId){
+        ['btn-daily','btn-weekly','btn-monthly'].forEach(function(id){
+            var el = document.getElementById(id);
+            if(!el) return;
+            if(id === btnId){ el.classList.add('active'); }
+            else { el.classList.remove('active'); }
+        });
+    }
+
+    document.getElementById('btn-daily')?.addEventListener('click', function(){ setActive('btn-daily'); showMileage(mileageDaily); });
+    document.getElementById('btn-weekly')?.addEventListener('click', function(){ setActive('btn-weekly'); showMileage(mileageWeekly); });
+    document.getElementById('btn-monthly')?.addEventListener('click', function(){ setActive('btn-monthly'); showMileage(mileageMonthly); });
+    {% endif %}
+
+    // Render the pace trend charts (toggle between daily/weekly/monthly)
+    {% if analysis.pace_trend_daily %}
+    var paceDaily = {{ analysis.pace_trend_daily | safe }};
+    var paceWeekly = {{ analysis.pace_trend_weekly | safe }};
+    var paceMonthly = {{ analysis.pace_trend_monthly | safe }};
+
+    function showPace(figJson) {
+        Plotly.newPlot('pace-trend-chart', figJson.data, figJson.layout, {responsive: true});
+    }
+    // default: daily
+    showPace(paceDaily);
+
+    function setActivePace(btnId){
+        ['btn-pace-daily','btn-pace-weekly','btn-pace-monthly'].forEach(function(id){
+            var el = document.getElementById(id);
+            if(!el) return;
+            if(id === btnId){ el.classList.add('active'); }
+            else { el.classList.remove('active'); }
+        });
+    }
+
+    document.getElementById('btn-pace-daily')?.addEventListener('click', function(){ setActivePace('btn-pace-daily'); showPace(paceDaily); });
+    document.getElementById('btn-pace-weekly')?.addEventListener('click', function(){ setActivePace('btn-pace-weekly'); showPace(paceWeekly); });
+    document.getElementById('btn-pace-monthly')?.addEventListener('click', function(){ setActivePace('btn-pace-monthly'); showPace(paceMonthly); });
     {% endif %}
 {% endif %}
 </script>

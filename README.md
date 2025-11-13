@@ -5,17 +5,27 @@ A Python Flask web application that connects to your Strava account and provides
 ## Features
 
 - 🔐 Secure Strava OAuth authentication
-- 📊 Interactive tabbed charts with 4 views:
-  - Activity Count Distribution (pie chart with counts and percentages)
-  - Time Distribution (pie chart with hours and percentages)
-  - Run Distance Distribution (bar chart with 1-mile bins and 10K count)
-  - Heart Rate Zones (color-coded from green to red)
-- 🏃‍♂️ Running mileage tracking
-- ⛰️ Total elevation gain tracking
-- ⏱️ Total activity time tracking
+- 📊 Interactive tabbed charts with 6 views:
+  - **Activity Count Distribution**: Pie chart showing activity types with counts and percentages
+  - **Time Distribution**: Pie chart showing time spent on each activity type (formatted as hours and minutes)
+  - **Run Distance Distribution**: Bar chart with 1-mile bins + running summary card showing:
+    - Total Runs
+    - 10K+ Runs (6.2 miles or longer)
+    - Average Pace (in MM:SS format per mile)
+    - Total Miles
+  - **Heart Rate Zones**: Color-coded zones from green (recovery) to red (anaerobic)
+  - **Mileage Trend**: Toggle between Daily, Weekly, Monthly running mileage with proper time-series display
+  - **Pace Trend**: Toggle between Daily, Weekly, Monthly average pace with reversed Y-axis (faster at top)
+- 📈 Advanced visualizations:
+  - Weekly charts show week numbers and start dates on X-axis
+  - Monthly charts show month names on X-axis
+  - Pace displayed in traditional MM:SS format throughout
+- 🏃‍♂️ Running metrics tracking with detailed statistics
+- ⛰️ Total elevation gain tracking (in feet)
+- ⏱️ Total activity time tracking (formatted as hours and minutes)
 - 🎯 Most common activity identification
 - 📅 Custom date range selection
-- 📱 Responsive web interface
+- 📱 Responsive web interface with Bootstrap styling
 
 ## Output
 
@@ -152,11 +162,21 @@ The application will be available at `http://localhost:3000`
 1. **Connect to Strava**: Click the "Connect with Strava" button and authorize the application
 2. **Select Date Range**: Choose start and end dates for your analysis
 3. **View Results**: Get comprehensive analytics including:
+   - **Summary Stats Bar**: Most common activity, running miles, total time (HH:MM format), and elevation gain
    - **Activity Count Distribution**: Pie chart showing activity types with counts and percentages
-   - **Time Distribution**: Pie chart showing time spent on each activity type with hours and percentages
-   - **Run Distance Distribution**: Bar chart showing distribution of running distances (0-1 mi, 1-2 mi, etc.) with 10K count
+   - **Time Distribution**: Pie chart showing time spent per activity type in hours and minutes format
+   - **Run Distance Distribution**:
+     - Bar chart with 1-mile distance bins
+     - Running summary card with total runs, 10K+ runs count, average pace, and total miles
+     - Highlighted banner for runs 10K (6.2 miles) or longer
    - **Heart Rate Zone Analysis**: Color-coded zones from green (recovery) to red (anaerobic)
-   - **Summary Stats**: Most common activity, total hours, running miles, and elevation gain
+   - **Mileage Trend**: Interactive charts showing daily/weekly/monthly running mileage
+     - Weekly view shows week numbers and start dates
+     - Monthly view shows month names (e.g., "Jan 2024")
+   - **Pace Trend**: Interactive charts showing daily/weekly/monthly average pace
+     - Pace displayed in MM:SS format (e.g., "9:30" per mile)
+     - Y-axis reversed so faster pace appears at top
+     - Hover tooltips show week numbers and date ranges
 
 ## API Rate Limits
 
