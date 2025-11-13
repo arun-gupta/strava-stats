@@ -40,6 +40,12 @@ A Python Flask web application that connects to your Strava account and provides
 ### Run Distribution
 ![Run Distribution](images/run-distribution.png)
 
+### Mileage Trend
+![Mileage Trend](images/mileage-trend.png)
+
+### Pace Trend
+![Pace Trend](images/pace-trend.png)
+
 ## Quick Start
 
 Get up and running in 3 steps:
