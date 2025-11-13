@@ -232,7 +232,10 @@ def process_activities(activities, access_token):
     pie_chart = go.Figure(data=[go.Pie(
         labels=list(activity_counts.index),
         values=list(activity_counts.values),
-        hole=0.3
+        hole=0.3,
+        texttemplate='%{label}<br>%{value} (%{percent})',
+        textposition='inside',
+        insidetextorientation='horizontal'
     )])
     pie_chart.update_layout(title="Activity Types Distribution")
     pie_chart_json = json.dumps(pie_chart, cls=plotly.utils.PlotlyJSONEncoder)
@@ -253,7 +256,8 @@ def process_activities(activities, access_token):
         values=list(duration_by_type.values / 3600),  # Convert to hours
         hole=0.3,
         texttemplate='%{label}<br>%{value:.1f}h (%{percent})',
-        textposition='auto'
+        textposition='inside',
+        insidetextorientation='horizontal'
     )])
     duration_pie_chart.update_layout(title="Time Distribution by Activity Type")
     duration_pie_chart_json = json.dumps(duration_pie_chart, cls=plotly.utils.PlotlyJSONEncoder)

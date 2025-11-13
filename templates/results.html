@@ -152,12 +152,19 @@
                         </div>
                         <div class="tab-pane fade" id="hr-zone-chart" role="tabpanel" aria-labelledby="hr-zone-tab">
                             <div class="row">
+                                {% set zone_colors = {
+                                    'Zone 1 (Recovery)': '#28a745',
+                                    'Zone 2 (Aerobic)': '#7ed321',
+                                    'Zone 3 (Tempo)': '#ffc107',
+                                    'Zone 4 (Threshold)': '#fd7e14',
+                                    'Zone 5 (Anaerobic)': '#dc3545'
+                                } %}
                                 {% for zone, percentage in analysis.zone_analysis.items() %}
                                     <div class="col-md-2">
-                                        <div class="card zone-card mb-2">
+                                        <div class="card zone-card mb-2" style="background-color: {{ zone_colors.get(zone, '#6c757d') }} !important; color: white !important; border: none !important;">
                                             <div class="card-body text-center p-2">
-                                                <h6 class="card-title mb-1">{{ percentage }}%</h6>
-                                                <small>{{ zone }}</small>
+                                                <h6 class="card-title mb-1" style="color: white !important;">{{ percentage }}%</h6>
+                                                <small style="color: white !important;">{{ zone }}</small>
                                             </div>
                                         </div>
                                     </div>
