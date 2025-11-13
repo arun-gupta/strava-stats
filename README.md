@@ -97,17 +97,23 @@ FLASK_SECRET_KEY=your_generated_secret_key_here
 
 ### 4. Run the Application
 
-**With virtual environment activated:**
+**Option 1: Quick Start (Recommended)**
+```bash
+./quickstart.sh
+```
+This script handles everything: creates venv, installs dependencies, and starts the app.
+
+**Option 2: Run script (if already set up)**
 ```bash
 ./run.sh
 ```
+Stops any existing Flask processes and starts a new one.
 
-**Or manually:**
+**Option 3: Manual**
 ```bash
+source venv/bin/activate
 python app.py
 ```
-
-**Note:** The `run.sh` script automatically stops any existing Flask processes before starting a new one.
 
 The application will be available at `http://localhost:3000`
 
