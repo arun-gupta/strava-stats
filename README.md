@@ -17,6 +17,20 @@ A Python Flask web application that connects to your Strava account and provides
 - 📅 Custom date range selection
 - 📱 Responsive web interface
 
+## Screenshots
+
+### Analysis Dashboard
+![Analysis Dashboard](images/dashboard.png)
+
+### Activity Distribution Charts
+![Activity Charts](images/activity-charts.png)
+
+### Run Distance Distribution
+![Run Distribution](images/run-distribution.png)
+
+### Heart Rate Zones
+![Heart Rate Zones](images/heart-rate-zones.png)
+
 ## Quick Start
 
 Get up and running in 3 steps:
