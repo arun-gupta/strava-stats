@@ -1,14 +1,19 @@
 # Strava Stats Web Application
 
-A Python Flask web application that connects to your Strava account and provides detailed analytics about your activities including activity type distribution, running/walking mileage, calories burned, and heart rate zone analysis.
+A Python Flask web application that connects to your Strava account and provides detailed analytics about your activities including activity type distribution, time distribution, running distance analysis, elevation tracking, and heart rate zone analysis.
 
 ## Features
 
 - 🔐 Secure Strava OAuth authentication
-- 📊 Interactive pie chart of activity types
-- 🏃‍♂️ Running and walking mileage tracking
-- 🔥 Calories burned analysis
-- 💓 Heart rate zone distribution
+- 📊 Interactive tabbed charts with 4 views:
+  - Activity Count Distribution (pie chart with counts and percentages)
+  - Time Distribution (pie chart with hours and percentages)
+  - Run Distance Distribution (bar chart with 1-mile bins and 10K count)
+  - Heart Rate Zones (color-coded from green to red)
+- 🏃‍♂️ Running mileage tracking
+- ⛰️ Total elevation gain tracking
+- ⏱️ Total activity time tracking
+- 🎯 Most common activity identification
 - 📅 Custom date range selection
 - 📱 Responsive web interface
 
@@ -94,11 +99,11 @@ The application will be available at `http://localhost:3000`
 1. **Connect to Strava**: Click the "Connect with Strava" button and authorize the application
 2. **Select Date Range**: Choose start and end dates for your analysis
 3. **View Results**: Get comprehensive analytics including:
-   - Activity type distribution pie chart
-   - Running and walking mileage summary
-   - Calories burned (if available in your activities)
-   - Heart rate zone breakdown
-   - Key insights and recommendations
+   - **Activity Count Distribution**: Pie chart showing activity types with counts and percentages
+   - **Time Distribution**: Pie chart showing time spent on each activity type with hours and percentages
+   - **Run Distance Distribution**: Bar chart showing distribution of running distances (0-1 mi, 1-2 mi, etc.) with 10K count
+   - **Heart Rate Zone Analysis**: Color-coded zones from green (recovery) to red (anaerobic)
+   - **Summary Stats**: Most common activity, total hours, running miles, and elevation gain
 
 ## API Rate Limits
 
