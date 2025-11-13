@@ -108,6 +108,10 @@ The application respects Strava's API rate limits:
 
 For large date ranges with many activities, the app may take some time to fetch all data.
 
+## Known Limitations
+
+- **Activity Type Categorization**: Due to Strava API behavior, some activities may be categorized as "Workout" instead of their specific type (e.g., "WeightTraining"). The application automatically combines "Workout" activities with "WeightTraining" for consistency.
+
 ## Troubleshooting
 
 ### Common Issues

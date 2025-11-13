@@ -88,37 +88,15 @@
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card stat-card position-relative" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 data-bs-html="true"
-                 data-bs-title="<strong>Calories Calculation:</strong><br>
-                               {% if analysis.calories_estimated %}
-                               🔸 <strong>Estimated</strong> based on activity type & duration<br>
-                               • Running: 12 cal/min<br>
-                               • Cycling: 8 cal/min<br>
-                               • Walking: 4 cal/min<br>
-                               • Swimming: 10 cal/min<br>
-                               • Weight Training: 6 cal/min<br>
-                               • Other activities: 8 cal/min
-                               {% else %}
-                               🔸 <strong>From Strava Data</strong><br>
-                               Actual calories recorded by your devices
-                               {% endif %}"
+            <div class="card stat-card"
+                 data-bs-toggle="tooltip"
+                 data-bs-placement="top"
+                 data-bs-title="Total time spent across all activities (moving time)"
                  style="cursor: help;">
                 <div class="card-body text-center">
-                    <h3 class="card-title">
-                        {% if analysis.total_calories %}
-                            {{ "{:,}".format(analysis.total_calories) }}
-                            {% if analysis.calories_estimated %}
-                                <small class="d-block" style="font-size: 0.6em; opacity: 0.8;">*estimated</small>
-                            {% endif %}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </h3>
+                    <h3 class="card-title">{{ analysis.total_duration_hours }}</h3>
                     <p class="card-text">
-                        Calories Burned 
+                        Total Hours
                         <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
                     </p>
                 </div>
@@ -126,30 +104,61 @@
         </div>
     </div>
 
-    <!-- Activity Distribution Chart -->
+    <!-- Activity Distribution Charts -->
     <div class="row mb-4">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0">Activity Types Distribution</h5>
+                    <ul class="nav nav-tabs card-header-tabs" id="chartTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="count-tab" data-bs-toggle="tab" data-bs-target="#count-chart" type="button" role="tab" aria-controls="count-chart" aria-selected="true">
+                                Activity Count
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="duration-tab" data-bs-toggle="tab" data-bs-target="#duration-chart" type="button" role="tab" aria-controls="duration-chart" aria-selected="false">
+                                Time
+                            </button>
+                        </li>
+                    </ul>
                 </div>
                 <div class="card-body">
-                    <div id="activity-pie-chart"></div>
+                    <div class="tab-content" id="chartTabContent">
+                        <div class="tab-pane fade show active" id="count-chart" role="tabpanel" aria-labelledby="count-tab">
+                            <div id="activity-pie-chart"></div>
+                        </div>
+                        <div class="tab-pane fade" id="duration-chart" role="tabpanel" aria-labelledby="duration-tab">
+                            <div id="duration-pie-chart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">
+                        <strong>Note:</strong> Activities categorized as "Workout" in Strava are combined with "WeightTraining" due to Strava API limitations.
+                    </small>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+    </div>
+
+    <!-- Activity Breakdown -->
+    <div class="row mb-4">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h5 class="mb-0">Activity Breakdown</h5>
                 </div>
                 <div class="card-body">
-                    {% for activity_type, count in analysis.activity_breakdown.items() %}
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>{{ activity_type }}</span>
-                            <span class="badge bg-primary">{{ count }}</span>
-                        </div>
-                    {% endfor %}
+                    <div class="row">
+                        {% for activity_type, count in analysis.activity_breakdown.items() %}
+                            <div class="col-md-3 mb-2">
+                                <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                                    <span>{{ activity_type }}</span>
+                                    <span class="badge bg-primary">{{ count }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -202,20 +211,13 @@
                             ({{ analysis.running_miles }} running + {{ analysis.walking_miles }} walking)
                         </li>
                         <li class="mb-2">
-                            📊 <strong>Most Common Activity:</strong> 
+                            📊 <strong>Most Common Activity:</strong>
                             {{ analysis.activity_breakdown.keys() | list | first }}
                         </li>
-                        {% if analysis.total_calories %}
                         <li class="mb-2">
-                            🔥 <strong>Calories Burned:</strong> 
-                            {{ "{:,}".format(analysis.total_calories) }} calories
-                            {% if analysis.calories_estimated %}
-                                (estimated based on activity type and duration)
-                            {% else %}
-                                (from Strava data)
-                            {% endif %}
+                            ⏱️ <strong>Total Time:</strong>
+                            {{ analysis.total_duration_hours }} hours
                         </li>
-                        {% endif %}
                         <li class="mb-2">
                             💓 <strong>Training Focus:</strong> 
                             {% if analysis.zone_analysis['Zone 2 (Aerobic)'] > 30 %}
@@ -235,9 +237,13 @@
 
 <script>
 {% if analysis %}
-    // Render the pie chart
+    // Render the activity count pie chart
     var pieChartData = {{ analysis.pie_chart | safe }};
     Plotly.newPlot('activity-pie-chart', pieChartData.data, pieChartData.layout, {responsive: true});
+
+    // Render the duration pie chart
+    var durationChartData = {{ analysis.duration_pie_chart | safe }};
+    Plotly.newPlot('duration-pie-chart', durationChartData.data, durationChartData.layout, {responsive: true});
 {% endif %}
 </script>
 {% endblock %}

@@ -196,96 +196,88 @@ def process_activities(activities, access_token):
     print("Available columns in Strava data:", df.columns.tolist())
     if len(activities) > 0:
         print("Sample activity data keys:", list(activities[0].keys()))
-    
+
+    # Show which activities are categorized as "Workout" before normalization
+    workout_activities = df[df['type'] == 'Workout']
+    if not workout_activities.empty:
+        print("\n" + "="*50)
+        print("Activities categorized as 'Workout':")
+        for idx, activity in workout_activities.iterrows():
+            activity_name = activity.get('name', 'Unnamed')
+            activity_date = activity.get('start_date', 'Unknown date')
+            activity_id = activity.get('id', 'No ID')
+            print(f"  - {activity_name} (Date: {activity_date}, ID: {activity_id})")
+        print("="*50 + "\n")
+
+    # Normalize activity types - combine similar activities
+    df['type'] = df['type'].replace({
+        'Workout': 'WeightTraining',  # Combine Workout with WeightTraining
+        'VirtualRun': 'Run',  # Combine VirtualRun with Run
+        'VirtualRide': 'Ride'  # Combine VirtualRide with Ride
+    })
+
     # Activity type distribution
     activity_counts = df['type'].value_counts()
-    
+
+    print("="*50)
+    print("Activity counts:")
+    print(activity_counts)
+    print(f"Labels: {list(activity_counts.index)}")
+    print(f"Values: {list(activity_counts.values)}")
+    print("\nAll unique activity types:")
+    print(df['type'].unique())
+    print("="*50)
+
     # Create pie chart for activity types
     pie_chart = go.Figure(data=[go.Pie(
-        labels=activity_counts.index,
-        values=activity_counts.values,
+        labels=list(activity_counts.index),
+        values=list(activity_counts.values),
         hole=0.3
     )])
     pie_chart.update_layout(title="Activity Types Distribution")
     pie_chart_json = json.dumps(pie_chart, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
+    print(f"Pie chart JSON length: {len(pie_chart_json)}")
+
+    # Calculate total duration
+    total_duration_seconds = df['moving_time'].sum() if 'moving_time' in df.columns else 0
+    total_duration_hours = total_duration_seconds / 3600
+    print(f"Total duration: {total_duration_hours:.2f} hours ({total_duration_seconds} seconds)")
+
+    # Calculate duration by activity type for pie chart
+    duration_by_type = df.groupby('type')['moving_time'].sum() if 'moving_time' in df.columns else pd.Series()
+
+    # Create duration pie chart
+    duration_pie_chart = go.Figure(data=[go.Pie(
+        labels=list(duration_by_type.index),
+        values=list(duration_by_type.values / 3600),  # Convert to hours
+        hole=0.3,
+        texttemplate='%{label}<br>%{value:.1f}h',
+        textposition='auto'
+    )])
+    duration_pie_chart.update_layout(title="Time Distribution by Activity Type")
+    duration_pie_chart_json = json.dumps(duration_pie_chart, cls=plotly.utils.PlotlyJSONEncoder)
+
     # Calculate running and walking stats
     running_activities = df[df['type'].isin(['Run', 'VirtualRun'])]
     walking_activities = df[df['type'] == 'Walk']
-    
+
     running_distance = running_activities['distance'].sum() / 1609.34 if not running_activities.empty else 0
     walking_distance = walking_activities['distance'].sum() / 1609.34 if not walking_activities.empty else 0
-    
-    # Calculate total calories - handle different possible field names and missing data
-    total_calories = 0
-    calories_found = False
-    
-    # Check for different possible calorie field names in Strava API
-    possible_calorie_fields = ['calories', 'kilojoules', 'total_calories']
-    
-    for field in possible_calorie_fields:
-        if field in df.columns:
-            print(f"Found calorie field: {field}")
-            # Remove NaN values and sum
-            field_sum = df[field].fillna(0).sum()
-            print(f"Sum for {field}: {field_sum}")
-            if field_sum > 0:
-                if field == 'kilojoules':
-                    # Convert kilojoules to calories (1 kJ ≈ 0.239 calories)
-                    total_calories += field_sum * 0.239
-                else:
-                    total_calories += field_sum
-                calories_found = True
-    
-    # If no calorie data found, estimate based on activity type and duration
-    if not calories_found or total_calories == 0:
-        print("No calorie data found, estimating...")
-        total_calories = estimate_calories_from_activities(df)
-        print(f"Estimated calories: {total_calories}")
-    
+
     # Heart rate zones analysis (simplified - would need detailed API calls for each activity)
     zone_analysis = analyze_heart_rate_zones(activities, access_token)
-    
+
     return {
         'pie_chart': pie_chart_json,
+        'duration_pie_chart': duration_pie_chart_json,
         'total_activities': len(activities),
         'running_miles': round(running_distance, 2),
         'walking_miles': round(walking_distance, 2),
-        'total_calories': int(round(total_calories)) if total_calories > 0 else None,
-        'calories_estimated': not calories_found,
+        'total_duration_hours': round(total_duration_hours, 2),
         'activity_breakdown': activity_counts.to_dict(),
         'zone_analysis': zone_analysis
     }
-
-def estimate_calories_from_activities(df):
-    """Estimate calories burned based on activity type and duration"""
-    # Rough calorie estimates per minute by activity type
-    calorie_rates = {
-        'Run': 12,
-        'VirtualRun': 12,
-        'Ride': 8,
-        'VirtualRide': 8,
-        'Walk': 4,
-        'Hike': 6,
-        'Swim': 10,
-        'Workout': 8,
-        'WeightTraining': 6,
-        'Yoga': 3,
-        'CrossTraining': 10
-    }
-    
-    total_estimated_calories = 0
-    
-    for _, activity in df.iterrows():
-        activity_type = activity.get('type', 'Workout')
-        moving_time = activity.get('moving_time', 0)  # in seconds
-        
-        if moving_time > 0:
-            minutes = moving_time / 60
-            rate = calorie_rates.get(activity_type, 8)  # default 8 cal/min
-            total_estimated_calories += minutes * rate
-    
-    return total_estimated_calories
 
 def analyze_heart_rate_zones(activities, access_token):
     """Analyze heart rate zones across activities"""
