@@ -26,20 +26,27 @@ A Python Flask web application that connects to your Strava account and provides
    - **Authorization Callback Domain**: localhost
 4. Note down your **Client ID** and **Client Secret**
 
-### 2. Virtual Environment Setup (Already Done!)
+### 2. Virtual Environment Setup
 
-The project is already set up with a Python virtual environment. All dependencies are installed and ready to use.
-
-**To activate the virtual environment:**
+**Create the virtual environment:**
 ```bash
 cd strava-stats
+python3 -m venv venv
+```
+
+**Activate the virtual environment:**
+```bash
 source activate.sh
 ```
 
 **Or manually:**
 ```bash
-cd strava-stats
 source venv/bin/activate
+```
+
+**Install dependencies:**
+```bash
+pip install -r requirements.txt
 ```
 
 **To deactivate when done:**
@@ -54,11 +61,16 @@ deactivate
 cp .env.example .env
 ```
 
-2. Edit `.env` and add your Strava credentials:
+2. Generate a Flask secret key:
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
+
+3. Edit `.env` and add your Strava credentials and the generated secret key:
 ```
 STRAVA_CLIENT_ID=your_actual_client_id
 STRAVA_CLIENT_SECRET=your_actual_client_secret
-FLASK_SECRET_KEY=your_random_secret_key_here
+FLASK_SECRET_KEY=your_generated_secret_key_here
 ```
 
 ### 4. Run the Application
