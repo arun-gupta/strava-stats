@@ -29,29 +29,22 @@ A Python Flask web application that connects to your Strava account and provides
 
 ## Screenshots
 
-### Input Page
-![Input Page](images/input-page.png)
+<table>
+  <tr>
+    <td width="25%"><a href="images/input-page.png"><img src="images/input-page.png" alt="Input Page"/></a><br/><sub>Input Page</sub></td>
+    <td width="25%"><a href="images/dashboard.png"><img src="images/dashboard.png" alt="Dashboard"/></a><br/><sub>Dashboard</sub></td>
+    <td width="25%"><a href="images/time-distribution.png"><img src="images/time-distribution.png" alt="Time Distribution"/></a><br/><sub>Time Distribution</sub></td>
+    <td width="25%"><a href="images/workout-streaks.png"><img src="images/workout-streaks.png" alt="Workout Streaks"/></a><br/><sub>Workout Streaks</sub></td>
+  </tr>
+  <tr>
+    <td width="25%"><a href="images/run-distribution.png"><img src="images/run-distribution.png" alt="Run Distribution"/></a><br/><sub>Run Distribution</sub></td>
+    <td width="25%"><a href="images/running-heatmap.png"><img src="images/running-heatmap.png" alt="Running Heatmap"/></a><br/><sub>Running Heatmap</sub></td>
+    <td width="25%"><a href="images/mileage-trend.png"><img src="images/mileage-trend.png" alt="Mileage Trend"/></a><br/><sub>Mileage Trend</sub></td>
+    <td width="25%"><a href="images/pace-trend.png"><img src="images/pace-trend.png" alt="Pace Trend"/></a><br/><sub>Pace Trend</sub></td>
+  </tr>
+</table>
 
-### Dashboard
-![Dashboard](images/dashboard.png)
-
-### Time Distribution
-![Time Distribution](images/time-distribution.png)
-
-### Workout Streaks
-![Workout Streaks](images/workout-streaks.png)
-
-### Run Distribution
-![Run Distribution](images/run-distribution.png)
-
-### Running Heatmap
-![Running Heatmap](images/running-heatmap.png)
-
-### Mileage Trend
-![Mileage Trend](images/mileage-trend.png)
-
-### Pace Trend
-![Pace Trend](images/pace-trend.png)
+<sub>Click any image to view full size</sub>
 
 ## Quick Start
 
