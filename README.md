@@ -209,18 +209,6 @@ Make sure all required environment variables are set in your `.env` file:
 - `STRAVA_CLIENT_SECRET`: Your Strava app's client secret  
 - `FLASK_SECRET_KEY`: A random secret key for Flask sessions
 
-## ~~Planned Features~~ ✅ All Implemented!
-
-~~Future enhancements under consideration:~~
-
-- ~~**Personal Records**: Track fastest and slowest 10K times~~ ✅ Implemented
-- ~~**Best Mile Split**: Identify your best single-mile performance~~ ✅ Implemented
-- ~~**Longest Run**: Highlight your longest distance run~~ ✅ Implemented
-- ~~**Peak Elevation**: Show activity with most elevation gain~~ ✅ Implemented
-- ~~**Running Streaks**: Track current streak and analyze gap days~~ ✅ Implemented
-- ~~**Activity Heatmap**: Visual calendar showing active days~~ ✅ Implemented
-- ~~**Date Presets**: Quick selection buttons (last 7 days, last month, last 30 days)~~ ✅ Implemented
-
 ## Security Notes
 
 - Never commit your `.env` file to version control
