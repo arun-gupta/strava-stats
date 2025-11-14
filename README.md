@@ -1,32 +1,3 @@
-# Strava Stats Web Application
-
-A Python Flask web application that connects to your Strava account and provides detailed analytics about your activities including activity type distribution, time distribution, running distance analysis, elevation tracking, and pace trends.
-
-## Features
-
-- 🔐 Secure Strava OAuth authentication
-- 📊 Interactive tabbed charts with 5 views:
-  - **Activity Count Distribution**: Pie chart showing activity types with counts and percentages
-  - **Time Distribution**: Pie chart showing time spent on each activity type (formatted as hours and minutes)
-  - **Run Distance Distribution**: Bar chart with 1-mile bins + running summary card showing:
-    - Total Runs
-    - 10K+ Runs (6.2 miles or longer)
-    - Average Pace (in MM:SS format per mile)
-    - Total Miles
-  - **Mileage Trend**: Toggle between Daily, Weekly, Monthly running mileage with proper time-series display
-  - **Pace Trend**: Toggle between Daily, Weekly, Monthly average pace with continuous line showing rest days at zero
-- 📈 Advanced visualizations:
-  - Weekly charts show week numbers and start dates on X-axis
-  - Monthly charts show month names on X-axis
-  - Pace displayed in traditional MM:SS format throughout
-- 🏃‍♂️ Running metrics tracking with detailed statistics
-- ⛰️ Total elevation gain tracking (in feet)
-- ⏱️ Total activity time tracking (formatted as hours and minutes)
-- 🎯 Most common activity identification
-- 📅 Custom date range selection
-- 📱 Responsive web interface with Bootstrap styling
-
-## Output
 
 ### Input Page
 ![Input Page](images/input-page.png)
@@ -162,21 +133,18 @@ The application will be available at `http://localhost:3000`
 ## Usage
 
 1. **Connect to Strava**: Click the "Connect with Strava" button and authorize the application
-2. **Select Date Range**: Choose start and end dates for your analysis
-3. **View Results**: Get comprehensive analytics including:
-   - **Summary Stats Bar**: Most common activity, running miles, total time (HH:MM format), and elevation gain
-   - **Activity Count Distribution**: Pie chart showing activity types with counts and percentages
-   - **Time Distribution**: Pie chart showing time spent per activity type in hours and minutes format
-   - **Run Distance Distribution**:
+2. **Select Date Range**: Use quick presets (Last 7/30/90 Days, Last 6 Months, Last Year, Year to Date) or choose custom start and end dates
+3. **View Results**: Get comprehensive analytics across 7 tabs:
+   - **Activity Count**: Pie chart showing activity types with counts and percentages
+   - **Time**: Pie chart showing time spent per activity type in HH:MM format
+   - **Workout Streaks**: Heatmap showing all activities with hours-based intensity, track workout consistency across all activity types
+   - **Run Distribution**:
      - Bar chart with 1-mile distance bins
-     - Running summary card with total runs, 10K+ runs count, total miles, and average pace
-   - **Mileage Trend**: Interactive charts showing daily/weekly/monthly running mileage
-     - Weekly view shows week numbers and start dates
-     - Monthly view shows month names (e.g., "Jan 2024")
-   - **Pace Trend**: Interactive charts showing daily/weekly/monthly average pace
-     - Pace displayed in MM:SS format (e.g., "9:30" per mile)
-     - Daily view shows continuous line dropping to 0 on rest days
-     - Hover tooltips show week numbers and date ranges for weekly/monthly views
+     - Running summary card with total runs, 10K+ runs, total miles, and average pace
+     - Personal records: Best mile split, fastest 10K, longest run, most elevation gain
+   - **Running Heatmap**: Visual calendar colored by daily mileage intensity, track running streaks, gaps, and consistency
+   - **Mileage Trend**: Daily/weekly/monthly running mileage with adaptive x-axis labeling
+   - **Pace Trend**: Daily/weekly/monthly average pace in MM:SS format, continuous line showing rest days at 0:00
 
 ## API Rate Limits
 
@@ -196,7 +164,7 @@ For large date ranges with many activities, the app may take some time to fetch 
 
 1. **Authentication Error**: Ensure your Strava app's callback domain is set to `localhost`
 2. **No Activities Found**: Check that you have activities in the selected date range
-3. **Missing Heart Rate Data**: Zone analysis is estimated if detailed HR data isn't available
+3. **Slow Loading**: Large date ranges with many activities may take time to fetch due to Strava API rate limits
 
 ### Environment Variables
 
@@ -205,17 +173,17 @@ Make sure all required environment variables are set in your `.env` file:
 - `STRAVA_CLIENT_SECRET`: Your Strava app's client secret  
 - `FLASK_SECRET_KEY`: A random secret key for Flask sessions
 
-## Planned Features
+## ~~Planned Features~~ ✅ All Implemented!
 
-Future enhancements under consideration:
+~~Future enhancements under consideration:~~
 
-- **Personal Records**: Track fastest and slowest 10K times
-- **Best Mile Split**: Identify your best single-mile performance
-- **Longest Run**: Highlight your longest distance run
-- **Peak Elevation**: Show activity with most elevation gain
-- **Running Streaks**: Track current streak and analyze gap days
-- **Activity Heatmap**: Visual calendar showing active days
-- **Date Presets**: Quick selection buttons (last 7 days, last month, last 30 days)
+- ~~**Personal Records**: Track fastest and slowest 10K times~~ ✅ Implemented
+- ~~**Best Mile Split**: Identify your best single-mile performance~~ ✅ Implemented
+- ~~**Longest Run**: Highlight your longest distance run~~ ✅ Implemented
+- ~~**Peak Elevation**: Show activity with most elevation gain~~ ✅ Implemented
+- ~~**Running Streaks**: Track current streak and analyze gap days~~ ✅ Implemented
+- ~~**Activity Heatmap**: Visual calendar showing active days~~ ✅ Implemented
+- ~~**Date Presets**: Quick selection buttons (last 7 days, last month, last 30 days)~~ ✅ Implemented
 
 ## Security Notes
 

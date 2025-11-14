@@ -28,7 +28,11 @@
                         <i class="fas fa-calendar-alt"></i> Analysis Period
                     </h4>
                     <h5 class="mb-0">{{ analysis.date_range_formatted }}</h5>
-                    <small class="opacity-75">{{ analysis.total_activities }} activities analyzed</small>
+                    <div class="d-flex justify-content-center gap-4 mt-2">
+                        <small class="opacity-75">{{ analysis.total_activities }} activities analyzed</small>
+                        <small class="opacity-75">•</small>
+                        <small class="opacity-75">{{ analysis.workout_total_days_in_window }} days measured</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,8 +119,18 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="workout-streaks-tab" data-bs-toggle="tab" data-bs-target="#workout-streaks" type="button" role="tab" aria-controls="workout-streaks" aria-selected="false">
+                                Workout Streaks
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
                             <button class="nav-link" id="distance-tab" data-bs-toggle="tab" data-bs-target="#distance-chart" type="button" role="tab" aria-controls="distance-chart" aria-selected="false">
                                 Run Distribution
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="streaks-tab" data-bs-toggle="tab" data-bs-target="#streaks" type="button" role="tab" aria-controls="streaks" aria-selected="false">
+                                Running Heatmap
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -151,22 +165,50 @@
                                             <h5 class="mb-0">Running Summary</h5>
                                         </div>
                                         <div class="card-body">
-                                            <div class="mb-4">
+                                            <div class="mb-3">
                                                 <h2 class="text-primary mb-0">{{ analysis.total_runs }}</h2>
                                                 <small class="text-muted">Total Runs</small>
                                             </div>
-                                            <div class="mb-4">
+                                            <div class="mb-3">
                                                 <h2 class="text-success mb-0">{{ analysis.runs_10k_plus }}</h2>
                                                 <small class="text-muted">10K+ Runs</small>
                                             </div>
-                                            <div class="mb-4">
+                                            <div class="mb-3">
                                                 <h2 class="text-warning mb-0">{{ analysis.running_miles }}</h2>
                                                 <small class="text-muted">Total Miles</small>
                                             </div>
-                                            <div>
+                                            <div class="mb-3">
                                                 <h2 class="text-info mb-0">{{ analysis.avg_pace_formatted }}</h2>
                                                 <small class="text-muted">Avg Pace (/mi)</small>
                                             </div>
+                                            <hr>
+                                            <div class="mb-2">
+                                                <h5 class="text-secondary mb-1">Personal Records</h5>
+                                            </div>
+                                            {% if analysis.best_mile_split %}
+                                            <div class="mb-2">
+                                                <strong class="text-danger">{{ analysis.best_mile_split }}</strong>
+                                                <small class="text-muted d-block">Best Mile Split</small>
+                                            </div>
+                                            {% endif %}
+                                            {% if analysis.fastest_10k %}
+                                            <div class="mb-2">
+                                                <strong class="text-success">{{ analysis.fastest_10k }}</strong>
+                                                <small class="text-muted d-block">Fastest 10K</small>
+                                            </div>
+                                            {% endif %}
+                                            {% if analysis.longest_run %}
+                                            <div class="mb-2">
+                                                <strong class="text-primary">{{ analysis.longest_run }}</strong>
+                                                <small class="text-muted d-block">Longest Run</small>
+                                            </div>
+                                            {% endif %}
+                                            {% if analysis.most_elevation_run %}
+                                            <div class="mb-2">
+                                                <strong class="text-warning">{{ analysis.most_elevation_run }}</strong>
+                                                <small class="text-muted d-block">Most Elevation</small>
+                                            </div>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
@@ -209,6 +251,201 @@
                             <p class="text-muted text-center">No running activities found to compute pace trend.</p>
                             {% endif %}
                         </div>
+                        <div class="tab-pane fade" id="streaks" role="tabpanel" aria-labelledby="streaks-tab">
+                            {% if analysis.total_runs and analysis.total_runs > 0 %}
+
+                            <!-- Streak Timeline (one block per day) -->
+                            <div class="mb-2 d-flex align-items-center justify-content-between">
+                                <div class="small text-muted">Timeline</div>
+                                <div class="d-flex align-items-center gap-3 small">
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#e0e0e0;border:1px solid #d0d0d0"></span> Non-Running
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#9bd3ae"></span> Easy
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#59a14f"></span> Moderate
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#2e7d32"></span> Big day
+                                </div>
+                            </div>
+                            <div id="streak-timeline" class="border rounded p-2" style="display:flex; flex-wrap:wrap; gap:2px;"></div>
+
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.running_active_days }}</div>
+                                        <div class="text-muted">Running Days</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.running_missed_days }}</div>
+                                        <div class="text-muted">Non-Running Days</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.current_streak_days }}</div>
+                                        <div class="text-muted">Current Streak</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.longest_gap_days }}</div>
+                                        <div class="text-muted">Longest Gap</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if analysis.gap_spans and analysis.gap_spans|length > 0 %}
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#gapDetails" aria-expanded="false" aria-controls="gapDetails">
+                                    Show Gap Details
+                                </button>
+                                <div class="collapse mt-2" id="gapDetails">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Gap Start</th>
+                                                    <th>Gap End</th>
+                                                    <th class="text-end">Days</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for gap in analysis.gap_spans %}
+                                                <tr>
+                                                    <td>{{ gap.start }}</td>
+                                                    <td>{{ gap.end }}</td>
+                                                    <td class="text-end">{{ gap.length }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <small class="text-muted">Gap days represent consecutive days with no runs within the selected period.</small>
+                                </div>
+                            </div>
+                            {% else %}
+                                <p class="text-muted mb-0">No gaps — great consistency!</p>
+                            {% endif %}
+                            {% else %}
+                                <p class="text-muted mb-0">No running activities in this period to compute streaks.</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Workout Streaks Tab -->
+                        <div class="tab-pane fade" id="workout-streaks" role="tabpanel" aria-labelledby="workout-streaks-tab">
+                            {% if analysis.total_activities and analysis.total_activities > 0 %}
+                            <!-- Workout Streak Header -->
+                            <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 p-3 rounded" style="background: linear-gradient(90deg,#ff7b54 0%, #ffb26b 100%);">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div style="font-size:2rem" aria-hidden="true">💪</div>
+                                    <div>
+                                        <div class="fw-bold" style="font-size:1.1rem">Current Workout Streak</div>
+                                        <div class="h4 mb-0">{{ analysis.workout_current_streak_days }} days</div>
+                                        <small class="text-dark-50">Longest: {{ analysis.workout_longest_streak }} days</small>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    {% if analysis.workout_next_milestone %}
+                                    <div class="small text-muted">Next milestone</div>
+                                    <div class="h5 mb-0">{{ analysis.workout_next_milestone }} days</div>
+                                    <small class="text-muted">in {{ analysis.workout_days_to_next_milestone }} day{{ 's' if analysis.workout_days_to_next_milestone != 1 }}{% if analysis.workout_eta_next_milestone %} · by {{ analysis.workout_eta_next_milestone }}{% endif %}</small>
+                                    {% else %}
+                                    <div class="small text-muted">Milestones complete 🎉</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div class="alert alert-secondary py-2" role="alert">
+                                This view tracks all your activities (running, cycling, workouts, etc.), showing your consistency across all workout types. It measures consecutive days with at least one activity, helping you understand your overall training commitment.
+                            </div>
+
+                            <!-- Workout Timeline -->
+                            <div class="mb-2 d-flex align-items-center justify-content-between">
+                                <div class="small text-muted">Activity Timeline</div>
+                                <div class="d-flex align-items-center gap-3 small">
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#e0e0e0;border:1px solid #d0d0d0"></span> No Activity
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ffd4a3"></span> &lt; 30 min
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ffb26b"></span> 30 min - 1.5h
+                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ff7b54"></span> 1.5h+
+                                </div>
+                            </div>
+                            <div id="workout-streak-timeline" class="border rounded p-2" style="display:flex; flex-wrap:wrap; gap:2px;"></div>
+
+                            <div class="row text-center">
+                                <div class="col-md-2 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_active_days }}</div>
+                                        <div class="text-muted">Workout Days</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_missed_days }}</div>
+                                        <div class="text-muted">Missed Days</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_current_streak_days }}</div>
+                                        <div class="text-muted">Current Streak</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_days_since_last if analysis.workout_days_since_last is not none else '—' }}</div>
+                                        <div class="text-muted">Days Since Last</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_longest_gap_days }}</div>
+                                        <div class="text-muted">Longest Gap</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 mb-3">
+                                    <div>
+                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_total_gap_days }}</div>
+                                        <div class="text-muted">Total Gap Days</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {% if analysis.workout_gap_spans and analysis.workout_gap_spans|length > 0 %}
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#workoutGapDetails" aria-expanded="false" aria-controls="workoutGapDetails">
+                                    Show Gap Details
+                                </button>
+                                <div class="collapse mt-2" id="workoutGapDetails">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Gap Start</th>
+                                                    <th>Gap End</th>
+                                                    <th class="text-end">Days</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for gap in analysis.workout_gap_spans %}
+                                                <tr>
+                                                    <td>{{ gap.start }}</td>
+                                                    <td>{{ gap.end }}</td>
+                                                    <td class="text-end">{{ gap.length }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <small class="text-muted">Gap days represent consecutive days with no activities within the selected period.</small>
+                                </div>
+                            </div>
+                            {% else %}
+                                <p class="text-muted mb-0">No gaps — excellent consistency!</p>
+                            {% endif %}
+                            {% else %}
+                                <p class="text-muted mb-0">No activities in this period to compute streaks.</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 <div class="card-footer">
@@ -219,6 +456,7 @@
             </div>
         </div>
     </div>
+
 
 {% endif %}
 
@@ -265,8 +503,21 @@
     function showMileage(figJson) {
         Plotly.newPlot('mileage-trend-chart', figJson.data, figJson.layout, {responsive: true});
     }
-    // default: daily
-    showMileage(mileageDaily);
+
+    // Initialize chart when tab becomes visible
+    var mileageChartInitialized = false;
+    var mileageTabButton = document.getElementById('mileage-trend-tab');
+    if (mileageTabButton) {
+        mileageTabButton.addEventListener('shown.bs.tab', function() {
+            if (!mileageChartInitialized) {
+                showMileage(mileageDaily);
+                mileageChartInitialized = true;
+            } else {
+                // Resize existing chart when tab is shown
+                Plotly.Plots.resize('mileage-trend-chart');
+            }
+        });
+    }
 
     function setActive(btnId){
         ['btn-daily','btn-weekly','btn-monthly'].forEach(function(id){
@@ -291,8 +542,21 @@
     function showPace(figJson) {
         Plotly.newPlot('pace-trend-chart', figJson.data, figJson.layout, {responsive: true});
     }
-    // default: daily
-    showPace(paceDaily);
+
+    // Initialize chart when tab becomes visible
+    var paceChartInitialized = false;
+    var paceTabButton = document.getElementById('pace-trend-tab');
+    if (paceTabButton) {
+        paceTabButton.addEventListener('shown.bs.tab', function() {
+            if (!paceChartInitialized) {
+                showPace(paceDaily);
+                paceChartInitialized = true;
+            } else {
+                // Resize existing chart when tab is shown
+                Plotly.Plots.resize('pace-trend-chart');
+            }
+        });
+    }
 
     function setActivePace(btnId){
         ['btn-pace-daily','btn-pace-weekly','btn-pace-monthly'].forEach(function(id){
@@ -306,6 +570,80 @@
     document.getElementById('btn-pace-daily')?.addEventListener('click', function(){ setActivePace('btn-pace-daily'); showPace(paceDaily); });
     document.getElementById('btn-pace-weekly')?.addEventListener('click', function(){ setActivePace('btn-pace-weekly'); showPace(paceWeekly); });
     document.getElementById('btn-pace-monthly')?.addEventListener('click', function(){ setActivePace('btn-pace-monthly'); showPace(paceMonthly); });
+    {% endif %}
+
+    // Render Streak Timeline: small blocks per day, colored by miles
+    {% if analysis.streak_daily_dates %}
+    (function(){
+        var dates = {{ analysis.streak_daily_dates | tojson }};
+        var miles = {{ analysis.streak_daily_miles | tojson }};
+        var container = document.getElementById('streak-timeline');
+        if(!container) return;
+
+        function colorForMiles(m){
+            if(m <= 0) return '#e0e0e0';         // non-running day
+            if(m < 3) return '#9bd3ae';          // easy
+            if(m < 6) return '#59a14f';          // moderate
+            return '#2e7d32';                    // big day
+        }
+        for(var i=0;i<dates.length;i++){
+            var block = document.createElement('span');
+            block.style.width = '14px';
+            block.style.height = '14px';
+            block.style.borderRadius = '3px';
+            block.style.background = colorForMiles(miles[i] || 0);
+            block.style.border = '1px solid rgba(0,0,0,0.06)';
+            block.setAttribute('data-bs-toggle','tooltip');
+            var title = dates[i] + (miles[i] && miles[i] > 0 ? (' — ' + (miles[i].toFixed(2)) + ' mi') : ' — Non-Running Day');
+            block.setAttribute('title', title);
+            container.appendChild(block);
+        }
+        // Activate tooltips for new elements
+        if(window.bootstrap){
+            var tipEls = [].slice.call(container.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tipEls.forEach(function(el){ new bootstrap.Tooltip(el, {trigger:'hover focus'}); });
+        }
+    })();
+    {% endif %}
+
+    // Render workout streak timeline (all activities)
+    {% if analysis.workout_daily_dates and analysis.workout_daily_hours %}
+    (function(){
+        var dates = {{ analysis.workout_daily_dates | tojson }};
+        var hours = {{ analysis.workout_daily_hours | tojson }};
+        var container = document.getElementById('workout-streak-timeline');
+        if(!container) return;
+
+        function colorForHours(h){
+            if(h <= 0) return '#e0e0e0';         // no activity
+            if(h < 0.5) return '#ffd4a3';        // < 30 min
+            if(h < 1.5) return '#ffb26b';        // 30 min - 1.5 hours
+            return '#ff7b54';                     // 1.5+ hours
+        }
+        function formatHours(h){
+            if(h <= 0) return 'No Activity';
+            var hours = Math.floor(h);
+            var minutes = Math.round((h - hours) * 60);
+            return hours + ':' + (minutes < 10 ? '0' : '') + minutes;
+        }
+        for(var i=0;i<dates.length;i++){
+            var block = document.createElement('span');
+            block.style.width = '14px';
+            block.style.height = '14px';
+            block.style.borderRadius = '3px';
+            block.style.background = colorForHours(hours[i] || 0);
+            block.style.border = '1px solid rgba(0,0,0,0.06)';
+            block.setAttribute('data-bs-toggle','tooltip');
+            var title = dates[i] + ' — ' + formatHours(hours[i] || 0);
+            block.setAttribute('title', title);
+            container.appendChild(block);
+        }
+        // Activate tooltips for new elements
+        if(window.bootstrap){
+            var tipEls = [].slice.call(container.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tipEls.forEach(function(el){ new bootstrap.Tooltip(el, {trigger:'hover focus'}); });
+        }
+    })();
     {% endif %}
 {% endif %}
 </script>

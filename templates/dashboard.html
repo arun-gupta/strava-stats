@@ -13,6 +13,19 @@
                 </p>
                 
                 <form method="POST" action="{{ url_for('analyze') }}">
+                    <!-- Date Presets -->
+                    <div class="mb-3">
+                        <label class="form-label">Quick Select:</label>
+                        <div class="btn-group d-flex flex-wrap gap-2" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(7)">Last 7 Days</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(30)">Last 30 Days</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(90)">Last 90 Days</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(180)">Last 6 Months</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setDateRange(365)">Last Year</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="setYearToDate()">Year to Date</button>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -27,7 +40,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary btn-lg">
                             📊 Analyze Activities
@@ -50,28 +63,28 @@
                         <small>Time Distribution</small>
                     </div>
                     <div class="col-md-3 text-center mb-3">
+                        <div class="mb-2">💪</div>
+                        <small>Workout Streaks</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
                         <div class="mb-2">🏃‍♂️</div>
-                        <small>Run Distance Analysis</small>
+                        <small>Run Distribution</small>
+                    </div>
+                    <div class="col-md-3 text-center mb-3">
+                        <div class="mb-2">🔥</div>
+                        <small>Running Heatmap</small>
                     </div>
                     <div class="col-md-3 text-center mb-3">
                         <div class="mb-2">📈</div>
                         <small>Mileage Trends</small>
                     </div>
                     <div class="col-md-3 text-center mb-3">
-                        <div class="mb-2">⏱️</div>
+                        <div class="mb-2">⚡</div>
                         <small>Pace Trends</small>
                     </div>
                     <div class="col-md-3 text-center mb-3">
-                        <div class="mb-2">🏃</div>
-                        <small>Running Summary</small>
-                    </div>
-                    <div class="col-md-3 text-center mb-3">
-                        <div class="mb-2">⛰️</div>
-                        <small>Elevation Tracking</small>
-                    </div>
-                    <div class="col-md-3 text-center mb-3">
-                        <div class="mb-2">🎯</div>
-                        <small>Activity Insights</small>
+                        <div class="mb-2">🏆</div>
+                        <small>Personal Records</small>
                     </div>
                 </div>
             </div>
@@ -80,14 +93,28 @@
 </div>
 
 <script>
-// Set default dates (last 30 days)
-document.addEventListener('DOMContentLoaded', function() {
+// Set date range based on number of days
+function setDateRange(days) {
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 30);
-    
+    startDate.setDate(startDate.getDate() - days);
+
     document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
     document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+}
+
+// Set year to date range
+function setYearToDate() {
+    const endDate = new Date();
+    const startDate = new Date(endDate.getFullYear(), 0, 1); // January 1st of current year
+
+    document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+    document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+}
+
+// Set default dates (last 30 days) on page load
+document.addEventListener('DOMContentLoaded', function() {
+    setDateRange(30);
 });
 </script>
 {% endblock %}
