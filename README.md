@@ -1,3 +1,31 @@
+# Strava Stats Web Application
+
+A Python Flask web application that connects to your Strava account and provides detailed analytics about your activities including activity distribution, time tracking, running metrics, pace analysis, personal records, and consistency tracking through heatmaps.
+
+## Features
+
+- 🔐 Secure Strava OAuth authentication
+- 📊 Interactive tabbed interface with 7 comprehensive views:
+  - **Activity Count Distribution**: Pie chart showing activity types with counts and percentages
+  - **Time Distribution**: Pie chart showing time spent per activity type (HH:MM format)
+  - **Workout Streaks**: Heatmap tracking all activities with hours-based intensity visualization
+  - **Run Distribution**: Bar chart with 1-mile bins + running summary card showing:
+    - Total Runs & 10K+ Runs count
+    - Total Miles & Average Pace
+    - Personal Records: Best mile split, fastest 10K, longest run, most elevation
+  - **Running Heatmap**: Visual calendar colored by daily mileage intensity, track running streaks and gaps
+  - **Mileage Trend**: Daily/Weekly/Monthly running mileage with adaptive x-axis labeling
+  - **Pace Trend**: Daily/Weekly/Monthly average pace in MM:SS format, continuous line showing rest days
+- 📈 Advanced visualizations:
+  - Adaptive date labeling prevents cluttered x-axes on long date ranges
+  - Weekly charts show week numbers and start dates
+  - Monthly charts show month names (e.g., "Jan 2024")
+  - Heatmaps automatically wrap to avoid horizontal scrolling
+- 🎯 Quick date presets: Last 7/30/90 Days, Last 6 Months, Last Year, Year to Date
+- 🏃‍♂️ Comprehensive running metrics and personal records tracking
+- ⛰️ Elevation gain tracking and peak elevation identification
+- 📅 Custom date range selection with intuitive UI
+- 📱 Responsive web interface with Bootstrap styling
 
 ## Screenshots
 
