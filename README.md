@@ -1,4 +1,6 @@
 
+## Screenshots
+
 ### Input Page
 ![Input Page](images/input-page.png)
 
@@ -8,8 +10,14 @@
 ### Time Distribution
 ![Time Distribution](images/time-distribution.png)
 
+### Workout Streaks
+![Workout Streaks](images/workout-streaks.png)
+
 ### Run Distribution
 ![Run Distribution](images/run-distribution.png)
+
+### Running Heatmap
+![Running Heatmap](images/running-heatmap.png)
 
 ### Mileage Trend
 ![Mileage Trend](images/mileage-trend.png)
