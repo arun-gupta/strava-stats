@@ -110,62 +110,67 @@
                         </div>
                         <div class="tab-pane fade" id="distance-chart" role="tabpanel" aria-labelledby="distance-tab">
                             {% if analysis.run_distance_distribution %}
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div id="run-distance-chart"></div>
+                            <!-- Running Stats Summary -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Running Stats Summary</h5>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow-sm h-100">
-                                        <div class="card-header bg-primary text-white">
-                                            <h5 class="mb-0">Running Summary</h5>
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.total_runs }}</h3>
+                                            <small class="text-muted">Total Runs</small>
                                         </div>
-                                        <div class="card-body">
-                                            <div class="mb-3">
-                                                <h2 class="text-primary mb-0">{{ analysis.total_runs }}</h2>
-                                                <small class="text-muted">Total Runs</small>
-                                            </div>
-                                            <div class="mb-3">
-                                                <h2 class="text-success mb-0">{{ analysis.runs_10k_plus }}</h2>
-                                                <small class="text-muted">10K+ Runs</small>
-                                            </div>
-                                            <div class="mb-3">
-                                                <h2 class="text-warning mb-0">{{ analysis.running_miles }}</h2>
-                                                <small class="text-muted">Total Miles</small>
-                                            </div>
-                                            <div class="mb-3">
-                                                <h2 class="text-info mb-0">{{ analysis.avg_pace_formatted }}</h2>
-                                                <small class="text-muted">Avg Pace (/mi)</small>
-                                            </div>
-                                            <hr>
-                                            <div class="mb-2">
-                                                <h5 class="text-secondary mb-1">Personal Records</h5>
-                                            </div>
-                                            {% if analysis.best_mile_split %}
-                                            <div class="mb-2">
-                                                <strong class="text-danger">{{ analysis.best_mile_split }}</strong>
-                                                <small class="text-muted d-block">Best Mile Split</small>
-                                            </div>
-                                            {% endif %}
-                                            {% if analysis.fastest_10k %}
-                                            <div class="mb-2">
-                                                <strong class="text-success">{{ analysis.fastest_10k }}</strong>
-                                                <small class="text-muted d-block">Fastest 10K</small>
-                                            </div>
-                                            {% endif %}
-                                            {% if analysis.longest_run %}
-                                            <div class="mb-2">
-                                                <strong class="text-primary">{{ analysis.longest_run }}</strong>
-                                                <small class="text-muted d-block">Longest Run</small>
-                                            </div>
-                                            {% endif %}
-                                            {% if analysis.most_elevation_run %}
-                                            <div class="mb-2">
-                                                <strong class="text-warning">{{ analysis.most_elevation_run }}</strong>
-                                                <small class="text-muted d-block">Most Elevation</small>
-                                            </div>
-                                            {% endif %}
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.runs_10k_plus }}</h3>
+                                            <small class="text-muted">10K+ Runs</small>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.running_miles }}</h3>
+                                            <small class="text-muted">Total Miles</small>
+                                        </div>
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.avg_pace_formatted }}</h3>
+                                            <small class="text-muted">Avg Pace /mi</small>
                                         </div>
                                     </div>
+                                    <hr class="my-3">
+                                    <div class="row text-center">
+                                        {% if analysis.best_mile_split %}
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.best_mile_split }}</h3>
+                                            <small class="text-muted">Fastest Mile</small>
+                                        </div>
+                                        {% endif %}
+                                        {% if analysis.fastest_10k %}
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.fastest_10k }}</h3>
+                                            <small class="text-muted">Fastest 10K</small>
+                                        </div>
+                                        {% endif %}
+                                        {% if analysis.longest_run %}
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.longest_run }}</h3>
+                                            <small class="text-muted">Longest Run</small>
+                                        </div>
+                                        {% endif %}
+                                        {% if analysis.most_elevation_run %}
+                                        <div class="col-md-3 mb-3">
+                                            <h3 class="mb-0">{{ analysis.most_elevation_run }}</h3>
+                                            <small class="text-muted">Most Elevation</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Run Distance Distribution Chart -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Run Distance Distribution (miles)</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="run-distance-chart"></div>
                                 </div>
                             </div>
                             {% else %}
@@ -288,27 +293,6 @@
                         <!-- Workout Streaks Tab -->
                         <div class="tab-pane fade" id="workout-streaks" role="tabpanel" aria-labelledby="workout-streaks-tab">
                             {% if analysis.total_activities and analysis.total_activities > 0 %}
-                            <!-- Workout Streak Header -->
-                            <div class="d-flex flex-wrap align-items-center justify-content-between mb-3 p-3 rounded" style="background: linear-gradient(90deg,#ff7b54 0%, #ffb26b 100%);">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div style="font-size:2rem" aria-hidden="true">💪</div>
-                                    <div>
-                                        <div class="fw-bold" style="font-size:1.1rem">Current Workout Streak</div>
-                                        <div class="h4 mb-0">{{ analysis.workout_current_streak_days }} days</div>
-                                        <small class="text-dark-50">Longest: {{ analysis.workout_longest_streak }} days</small>
-                                    </div>
-                                </div>
-                                <div class="text-end">
-                                    {% if analysis.workout_next_milestone %}
-                                    <div class="small text-muted">Next milestone</div>
-                                    <div class="h5 mb-0">{{ analysis.workout_next_milestone }} days</div>
-                                    <small class="text-muted">in {{ analysis.workout_days_to_next_milestone }} day{{ 's' if analysis.workout_days_to_next_milestone != 1 }}{% if analysis.workout_eta_next_milestone %} · by {{ analysis.workout_eta_next_milestone }}{% endif %}</small>
-                                    {% else %}
-                                    <div class="small text-muted">Milestones complete 🎉</div>
-                                    {% endif %}
-                                </div>
-                            </div>
-
                             <!-- Description -->
                             <div class="alert alert-secondary py-2" role="alert">
                                 This view tracks all your activities (running, cycling, workouts, etc.), showing your consistency across all workout types. It measures consecutive days with at least one activity, helping you understand your overall training commitment.

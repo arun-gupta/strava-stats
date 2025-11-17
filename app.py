@@ -194,9 +194,10 @@ def process_activities(activities, access_token):
         labels=list(activity_counts.index),
         values=list(activity_counts.values),
         hole=0.3,
-        texttemplate='%{label}<br>%{value} (%{percent})',
+        texttemplate='%{label}<br>%{value} (%{percent:.1f})',
         textposition='inside',
-        insidetextorientation='horizontal'
+        insidetextorientation='horizontal',
+        hovertemplate='%{label}<br>%{value} activities<br>%{percent:.1f}<extra></extra>'
     )])
     pie_chart.update_layout(title="Activity Types Distribution")
     pie_chart_json = json.dumps(pie_chart, cls=plotly.utils.PlotlyJSONEncoder)
@@ -229,9 +230,10 @@ def process_activities(activities, access_token):
         values=duration_values,
         hole=0.3,
         text=duration_text,
-        texttemplate='%{label}<br>%{text} (%{percent})',
+        texttemplate='%{label}<br>%{text} (%{percent:.1f})',
         textposition='inside',
-        insidetextorientation='horizontal'
+        insidetextorientation='horizontal',
+        hovertemplate='%{label}<br>%{text}<br>%{percent:.1f}<extra></extra>'
     )])
     duration_pie_chart.update_layout(title="Time Distribution by Activity Type")
     duration_pie_chart_json = json.dumps(duration_pie_chart, cls=plotly.utils.PlotlyJSONEncoder)
