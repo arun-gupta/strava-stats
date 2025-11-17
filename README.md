@@ -33,16 +33,16 @@ A Python Flask web application that connects to your Strava account and provides
 
 <table>
   <tr>
-    <td width="25%"><a href="images/input-page.png"><img src="images/input-page.png" alt="Input Page"/></a><br/><sub>Input Page</sub></td>
-    <td width="25%"><a href="images/dashboard.png"><img src="images/dashboard.png" alt="Dashboard"/></a><br/><sub>Activity Count</sub></td>
-    <td width="25%"><a href="images/time-distribution.png"><img src="images/time-distribution.png" alt="Duration"/></a><br/><sub>Duration</sub></td>
-    <td width="25%"><a href="images/workout-streaks.png"><img src="images/workout-streaks.png" alt="Workout Heatmap"/></a><br/><sub>Workout Heatmap</sub></td>
+    <td width="25%"><a href="images/activity-count.png"><img src="images/activity-count.png" alt="Activity Count"/></a><br/><sub>Activity Count</sub></td>
+    <td width="25%"><a href="images/duration.png"><img src="images/duration.png" alt="Duration"/></a><br/><sub>Duration</sub></td>
+    <td width="25%"><a href="images/workout-heatmap.png"><img src="images/workout-heatmap.png" alt="Workout Heatmap"/></a><br/><sub>Workout Heatmap</sub></td>
+    <td width="25%"><a href="images/running-heatmap.png"><img src="images/running-heatmap.png" alt="Running Heatmap"/></a><br/><sub>Running Heatmap</sub></td>
   </tr>
   <tr>
-    <td width="25%"><a href="images/running-heatmap.png"><img src="images/running-heatmap.png" alt="Running Heatmap"/></a><br/><sub>Running Heatmap</sub></td>
-    <td width="25%"><a href="images/run-distribution.png"><img src="images/run-distribution.png" alt="Running Stats"/></a><br/><sub>Running Stats</sub></td>
+    <td width="25%"><a href="images/running-stats.png"><img src="images/running-stats.png" alt="Running Stats"/></a><br/><sub>Running Stats</sub></td>
     <td width="25%"><a href="images/mileage-trend.png"><img src="images/mileage-trend.png" alt="Mileage Trend"/></a><br/><sub>Mileage Trend</sub></td>
     <td width="25%"><a href="images/pace-trend.png"><img src="images/pace-trend.png" alt="Pace Trend"/></a><br/><sub>Pace Trend</sub></td>
+    <td width="25%"></td>
   </tr>
 </table>
 
