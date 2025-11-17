@@ -90,12 +90,51 @@ class StravaAPI:
 
 strava_api = StravaAPI()
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    """Home page"""
+    """Home page - shows analysis with default or submitted dates"""
     if 'access_token' not in session:
         return render_template('login.html', auth_url=strava_api.get_auth_url())
-    return render_template('dashboard.html')
+
+    # Get dates from POST form or use defaults (last 30 days)
+    if request.method == 'POST':
+        start_date_str = request.form.get('start_date')
+        end_date_str = request.form.get('end_date')
+    else:
+        # Default to last 30 days
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=30)
+        start_date_str = start_date.strftime('%Y-%m-%d')
+        end_date_str = end_date.strftime('%Y-%m-%d')
+
+    try:
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
+
+        # Add time to end date to include the full day
+        end_date = end_date.replace(hour=23, minute=59, second=59)
+
+    except ValueError:
+        return "Invalid date format", 400
+
+    # Fetch activities
+    activities = strava_api.get_activities(session['access_token'], start_date, end_date)
+
+    if not activities:
+        return render_template('results.html',
+                             message="No activities found in the specified date range.",
+                             start_date=start_date_str,
+                             end_date=end_date_str)
+
+    # Process activities data
+    analysis = process_activities(activities, session['access_token'])
+
+    # Add date range to analysis results
+    analysis['start_date'] = start_date_str
+    analysis['end_date'] = end_date_str
+    analysis['date_range_formatted'] = f"{start_date.strftime('%B %d, %Y')} - {end_date.strftime('%B %d, %Y')}"
+
+    return render_template('results.html', analysis=analysis, start_date=start_date_str, end_date=end_date_str)
 
 @app.route('/callback')
 def callback():
@@ -123,44 +162,6 @@ def logout():
     """Logout and clear session"""
     session.clear()
     return redirect(url_for('index'))
-
-@app.route('/analyze', methods=['POST'])
-def analyze():
-    """Analyze activities for given date range"""
-    if 'access_token' not in session:
-        return redirect(url_for('index'))
-    
-    start_date_str = request.form.get('start_date')
-    end_date_str = request.form.get('end_date')
-    
-    try:
-        start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
-        
-        # Add time to end date to include the full day
-        end_date = end_date.replace(hour=23, minute=59, second=59)
-        
-    except ValueError:
-        return "Invalid date format", 400
-    
-    # Fetch activities
-    activities = strava_api.get_activities(session['access_token'], start_date, end_date)
-    
-    if not activities:
-        return render_template('results.html', 
-                             message="No activities found in the specified date range.",
-                             start_date=start_date_str,
-                             end_date=end_date_str)
-    
-    # Process activities data
-    analysis = process_activities(activities, session['access_token'])
-    
-    # Add date range to analysis results
-    analysis['start_date'] = start_date_str
-    analysis['end_date'] = end_date_str
-    analysis['date_range_formatted'] = f"{start_date.strftime('%B %d, %Y')} - {end_date.strftime('%B %d, %Y')}"
-    
-    return render_template('results.html', analysis=analysis)
 
 def process_activities(activities, access_token):
     """Process activities data and generate analytics"""

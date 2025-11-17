@@ -10,93 +10,48 @@
     {% endif %}
     <a href="{{ url_for('index') }}" class="btn btn-primary">← Back to Dashboard</a>
 {% else %}
+    <!-- Date Range Selector and Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2>Activity Analysis Results</h2>
-                <a href="{{ url_for('index') }}" class="btn btn-outline-primary">← New Analysis</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Date Range and Summary Stats -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <div class="card-body text-center">
-                    <h4 class="card-title mb-2">
-                        <i class="fas fa-calendar-alt"></i> Analysis Period
-                    </h4>
-                    <h5 class="mb-0">{{ analysis.date_range_formatted }}</h5>
-                    <div class="d-flex justify-content-center gap-4 mt-2">
-                        <small class="opacity-75">{{ analysis.total_activities }} activities analyzed</small>
-                        <small class="opacity-75">•</small>
-                        <small class="opacity-75">{{ analysis.workout_total_days_in_window }} days measured</small>
+            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0"><i class="fas fa-calendar-alt"></i> Analysis Period</h2>
+                        <div class="d-flex align-items-center gap-2">
+                            <small class="opacity-75">{{ analysis.total_activities }} activities analyzed • {{ analysis.workout_total_days_in_window }} days measured</small>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Summary Stats -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card stat-card"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Most frequently performed activity type"
-                 style="cursor: help;">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.activity_breakdown.keys() | list | first }}</h3>
-                    <p class="card-text">
-                        Most Common Activity
-                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stat-card"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Total distance covered in running activities"
-                 style="cursor: help;">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.running_miles }}</h3>
-                    <p class="card-text">
-                        Running Miles
-                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stat-card"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Total time spent across all activities (moving time)"
-                 style="cursor: help;">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.total_duration_formatted }}</h3>
-                    <p class="card-text">
-                        Time
-                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stat-card"
-                 data-bs-toggle="tooltip"
-                 data-bs-placement="top"
-                 data-bs-title="Total elevation gained across all activities"
-                 style="cursor: help;">
-                <div class="card-body text-center">
-                    <h3 class="card-title">{{ analysis.total_elevation_feet }}</h3>
-                    <p class="card-text">
-                        Elevation (ft)
-                        <i class="fas fa-info-circle" style="font-size: 0.8em; opacity: 0.7;"></i>
-                    </p>
+                    <form method="POST" action="{{ url_for('index') }}">
+                        <!-- Quick Select Buttons -->
+                        <div class="mb-3">
+                            <div class="btn-group d-flex flex-wrap gap-2" role="group">
+                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(7)">Last 7 Days</button>
+                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(30)">Last 30 Days</button>
+                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(90)">Last 90 Days</button>
+                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(180)">Last 6 Months</button>
+                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(365)">Last Year</button>
+                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setYearToDate()">Year to Date</button>
+                            </div>
+                        </div>
+
+                        <!-- Date Inputs -->
+                        <div class="row align-items-end">
+                            <div class="col-md-4">
+                                <label for="start_date" class="form-label small opacity-75">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="end_date" class="form-label small opacity-75">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}" required>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-light w-100">
+                                    📊 Update Analysis
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -110,37 +65,37 @@
                     <ul class="nav nav-tabs card-header-tabs" id="chartTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="count-tab" data-bs-toggle="tab" data-bs-target="#count-chart" type="button" role="tab" aria-controls="count-chart" aria-selected="true">
-                                Activity Count
+                                📊 Activity Count
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="duration-tab" data-bs-toggle="tab" data-bs-target="#duration-chart" type="button" role="tab" aria-controls="duration-chart" aria-selected="false">
-                                Time
+                                ⏱️ Duration
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="workout-streaks-tab" data-bs-toggle="tab" data-bs-target="#workout-streaks" type="button" role="tab" aria-controls="workout-streaks" aria-selected="false">
-                                Workout Streaks
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="distance-tab" data-bs-toggle="tab" data-bs-target="#distance-chart" type="button" role="tab" aria-controls="distance-chart" aria-selected="false">
-                                Run Distribution
+                                💪 Workout Heatmap
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="streaks-tab" data-bs-toggle="tab" data-bs-target="#streaks" type="button" role="tab" aria-controls="streaks" aria-selected="false">
-                                Running Heatmap
+                                🔥 Running Heatmap
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="distance-tab" data-bs-toggle="tab" data-bs-target="#distance-chart" type="button" role="tab" aria-controls="distance-chart" aria-selected="false">
+                                🏃 Running Stats
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="mileage-trend-tab" data-bs-toggle="tab" data-bs-target="#mileage-trend" type="button" role="tab" aria-controls="mileage-trend" aria-selected="false">
-                                Mileage Trend
+                                📈 Mileage Trend
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="pace-trend-tab" data-bs-toggle="tab" data-bs-target="#pace-trend" type="button" role="tab" aria-controls="pace-trend" aria-selected="false">
-                                Pace Trend
+                                ⚡ Pace Trend
                             </button>
                         </li>
                     </ul>
@@ -461,6 +416,24 @@
 {% endif %}
 
 <script>
+// Date range helper functions
+function setDateRange(days) {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+    document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+}
+
+function setYearToDate() {
+    const endDate = new Date();
+    const startDate = new Date(endDate.getFullYear(), 0, 1);
+
+    document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
+    document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+}
+
 {% if analysis %}
     // Render the activity count pie chart
     var pieChartData = {{ analysis.pie_chart | safe }};
