@@ -486,7 +486,7 @@ def process_activities(activities, access_token, requested_start_date=None, requ
                         x=x_daily,
                         y=y_daily,
                         mode='lines+markers',
-                        line=dict(color="#4e79a7"),
+                        line=dict(color="#4e79a7", shape='spline', smoothing=0.3),
                         marker=dict(size=6),
                         hovertemplate='%{x|%Y-%m-%d}<br>%{y:.2f} mi<extra></extra>'
                     )
@@ -533,7 +533,7 @@ def process_activities(activities, access_token, requested_start_date=None, requ
                         x=x_weekly,
                         y=y_weekly,
                         mode='lines+markers',
-                        line=dict(color="#59a14f"),
+                        line=dict(color="#59a14f", shape='spline', smoothing=0.3),
                         marker=dict(size=8),
                         text=hover_text,
                         hovertemplate='%{text}<extra></extra>'
@@ -562,7 +562,7 @@ def process_activities(activities, access_token, requested_start_date=None, requ
                         x=x_monthly,
                         y=y_monthly,
                         mode='lines+markers',
-                        line=dict(color="#f28e2c"),
+                        line=dict(color="#f28e2c", shape='spline', smoothing=0.3),
                         marker=dict(size=8),
                         hovertemplate='%{x}<br>%{y:.2f} mi<extra></extra>'
                     )
@@ -615,7 +615,7 @@ def process_activities(activities, access_token, requested_start_date=None, requ
                         x=x_daily_pace,
                         y=y_daily_pace,
                         mode='lines+markers',
-                        line=dict(color="#e15759", width=2),
+                        line=dict(color="#e15759", width=2, shape='spline', smoothing=0.3),
                         marker=dict(size=5, symbol='circle'),
                         text=hover_text_daily_pace,
                         hovertemplate='%{text}<extra></extra>'
@@ -670,7 +670,7 @@ def process_activities(activities, access_token, requested_start_date=None, requ
                         x=x_weekly_pace,
                         y=y_weekly_pace,
                         mode='lines+markers',
-                        line=dict(color="#e15759"),
+                        line=dict(color="#e15759", shape='spline', smoothing=0.3),
                         marker=dict(size=8),
                         text=hover_text_pace,
                         hovertemplate='%{text}<extra></extra>'
@@ -706,7 +706,7 @@ def process_activities(activities, access_token, requested_start_date=None, requ
                         x=x_monthly_pace,
                         y=y_monthly_pace,
                         mode='lines+markers',
-                        line=dict(color="#e15759"),
+                        line=dict(color="#e15759", shape='spline', smoothing=0.3),
                         marker=dict(size=8),
                         text=hover_text_monthly_pace,
                         hovertemplate='%{text}<extra></extra>'
