@@ -4,18 +4,21 @@ A Python Flask web application that connects to your Strava account and provides
 
 ## Features
 
-- 🔐 Secure Strava OAuth authentication
-- 📊 Interactive tabbed interface with 7 comprehensive views:
-  - **📊 Activity Count**: Pie chart showing activity types with counts and percentages
+- 🔐 Secure Strava OAuth authentication with profile display (photo and name in navbar)
+- 📊 Interactive tabbed interface with 5 comprehensive views:
+  - **📊 Overview**: Pie chart showing activity types with counts and percentages
   - **⏱️ Duration**: Pie chart showing time spent per activity type (HH:MM format)
-  - **💪 Workout Heatmap**: Visual calendar tracking all activities with hours-based intensity visualization
-  - **🔥 Running Heatmap**: Visual calendar colored by daily mileage intensity, track running streaks and gaps
+  - **🔥 Heatmap**: Toggle between two visualization modes:
+    - **💪 All Workouts**: Visual calendar tracking all activities with hours-based intensity
+    - **🏃 Running**: Visual calendar colored by daily mileage intensity (< 3 mi, 3-6 mi, 6+ mi), track running streaks and gaps
   - **🏃 Running Stats**: Comprehensive running metrics displayed in a compact grid format:
     - Summary stats: Total Runs, 10K+ Runs, Total Miles, Average Pace
     - Personal Records: Fastest mile, fastest 10K, longest run, most elevation
     - Bar chart showing run distance distribution with 1-mile bins
-  - **📈 Mileage Trend**: Daily/Weekly/Monthly running mileage with adaptive x-axis labeling
-  - **⚡ Pace Trend**: Daily/Weekly/Monthly average pace in MM:SS format, continuous line showing rest days
+  - **📈 Trends**: Toggle between two trend views:
+    - **📈 Mileage**: Daily/Weekly/Monthly running mileage with adaptive x-axis labeling
+    - **⚡ Pace**: Daily/Weekly/Monthly average pace in MM:SS format, continuous line showing rest days
+- 📋 Summary cards showing Total Activities, Total Distance, and Active Days at a glance
 - 📈 Advanced visualizations:
   - Adaptive date labeling prevents cluttered x-axes on long date ranges
   - Weekly charts show week numbers and start dates
@@ -88,14 +91,12 @@ The quickstart script automatically:
    - Click quick presets (Last 7/30/90 Days, Last 6 Months, Last Year, Year to Date)
    - Choose custom start and end dates
    - Click "Update Analysis" to refresh the data
-4. **Explore Your Data**: Navigate through 7 comprehensive tabs:
-   - **📊 Activity Count**: Pie chart showing activity types with counts and percentages
+4. **Explore Your Data**: Navigate through 5 comprehensive tabs:
+   - **📊 Overview**: Pie chart showing activity types with counts and percentages
    - **⏱️ Duration**: Pie chart showing time spent per activity type in HH:MM format
-   - **💪 Workout Heatmap**: Visual calendar showing all activities with hours-based intensity, track workout consistency
-   - **🔥 Running Heatmap**: Visual calendar colored by daily mileage intensity, track running streaks, gaps, and consistency
+   - **🔥 Heatmap**: Toggle between All Workouts (hours-based) and Running (mileage-based) heatmaps
    - **🏃 Running Stats**: Comprehensive grid showing total runs, 10K+ runs, total miles, average pace, and personal records (fastest mile, fastest 10K, longest run, most elevation), plus distance distribution bar chart
-   - **📈 Mileage Trend**: Daily/weekly/monthly running mileage with adaptive x-axis labeling
-   - **⚡ Pace Trend**: Daily/weekly/monthly average pace in MM:SS format, continuous line showing rest days at 0:00
+   - **📈 Trends**: Toggle between Mileage and Pace trends with daily/weekly/monthly granularity
 
 ## API Rate Limits
 

@@ -10,33 +10,58 @@
     {% endif %}
     <a href="{{ url_for('index') }}" class="btn btn-primary">← Back to Dashboard</a>
 {% else %}
-    <!-- Date Range Selector and Header -->
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Date Range</h5>
+                    <h4 class="mb-2">{{ start_date }}</h4>
+                    <p class="text-muted mb-2">to</p>
+                    <h4 class="mb-0">{{ end_date }}</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Total Activities</h5>
+                    <h2 class="display-4">{{ analysis.total_activities }}</h2>
+                    <p class="text-muted mb-0">Across all types</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-muted">Total Moving Time</h5>
+                    <h2 class="display-4">{{ analysis.total_duration_formatted }}</h2>
+                    <p class="text-muted mb-0">Hours spent</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Range Selector -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="mb-0"><i class="fas fa-calendar-alt"></i> Analysis Period</h2>
-                        <div class="d-flex align-items-center gap-2">
-                            <small class="opacity-75">{{ analysis.total_activities }} activities analyzed • {{ analysis.workout_total_days_in_window }} days measured</small>
-                        </div>
-                    </div>
-
-                    <form method="POST" action="{{ url_for('index') }}">
+                    <form method="POST" action="{{ url_for('index') }}" id="dateRangeForm">
                         <!-- Quick Select Buttons -->
                         <div class="mb-3">
                             <div class="btn-group d-flex flex-wrap gap-2" role="group">
-                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(7)">Last 7 Days</button>
-                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(30)">Last 30 Days</button>
-                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(90)">Last 90 Days</button>
-                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(180)">Last 6 Months</button>
-                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setDateRange(365)">Last Year</button>
-                                <button type="button" class="btn btn-outline-light btn-sm" onclick="setYearToDate()">Year to Date</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setDateRangeAndSubmit(7)">Last 7 Days</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setDateRangeAndSubmit(30)">Last 30 Days</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setDateRangeAndSubmit(90)">Last 90 Days</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setDateRangeAndSubmit(180)">Last 6 Months</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setYearToDateAndSubmit()">Year to Date</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="showCustomDatePickers()">Custom</button>
                             </div>
                         </div>
 
-                        <!-- Date Inputs -->
-                        <div class="row align-items-end">
+                        <!-- Date Inputs (Hidden by default) -->
+                        <div class="row align-items-end" id="customDateInputs" style="display: none;">
                             <div class="col-md-4">
                                 <label for="start_date" class="form-label small opacity-75">Start Date</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date }}" required>
@@ -46,7 +71,7 @@
                                 <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date }}" required>
                             </div>
                             <div class="col-md-4">
-                                <button type="submit" class="btn btn-light w-100">
+                                <button type="submit" class="btn btn-primary w-100">
                                     📊 Update Analysis
                                 </button>
                             </div>
@@ -65,7 +90,7 @@
                     <ul class="nav nav-tabs card-header-tabs" id="chartTabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="count-tab" data-bs-toggle="tab" data-bs-target="#count-chart" type="button" role="tab" aria-controls="count-chart" aria-selected="true">
-                                📊 Activity Count
+                                📊 Overview
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -74,13 +99,8 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="workout-streaks-tab" data-bs-toggle="tab" data-bs-target="#workout-streaks" type="button" role="tab" aria-controls="workout-streaks" aria-selected="false">
-                                💪 Workout Heatmap
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="streaks-tab" data-bs-toggle="tab" data-bs-target="#streaks" type="button" role="tab" aria-controls="streaks" aria-selected="false">
-                                🔥 Running Heatmap
+                            <button class="nav-link" id="heatmap-tab" data-bs-toggle="tab" data-bs-target="#heatmap" type="button" role="tab" aria-controls="heatmap" aria-selected="false">
+                                🔥 Heatmap
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
@@ -89,13 +109,8 @@
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="mileage-trend-tab" data-bs-toggle="tab" data-bs-target="#mileage-trend" type="button" role="tab" aria-controls="mileage-trend" aria-selected="false">
-                                📈 Mileage Trend
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="pace-trend-tab" data-bs-toggle="tab" data-bs-target="#pace-trend" type="button" role="tab" aria-controls="pace-trend" aria-selected="false">
-                                ⚡ Pace Trend
+                            <button class="nav-link" id="trends-tab" data-bs-toggle="tab" data-bs-target="#trends" type="button" role="tab" aria-controls="trends" aria-selected="false">
+                                📈 Trends
                             </button>
                         </li>
                     </ul>
@@ -177,213 +192,238 @@
                             <p class="text-muted text-center">No running activities found</p>
                             {% endif %}
                         </div>
-                        <div class="tab-pane fade" id="mileage-trend" role="tabpanel" aria-labelledby="mileage-trend-tab">
-                            {% if analysis.mileage_trend_daily %}
+                        <!-- Combined Trends Tab -->
+                        <div class="tab-pane fade" id="trends" role="tabpanel" aria-labelledby="trends-tab">
+                            <!-- Toggle Button -->
                             <div class="d-flex justify-content-center mb-3">
-                                <div class="btn-group" role="group" aria-label="Mileage granularity">
-                                    <button type="button" class="btn btn-outline-primary active" id="btn-daily">Daily</button>
-                                    <button type="button" class="btn btn-outline-primary" id="btn-weekly">Weekly</button>
-                                    <button type="button" class="btn btn-outline-primary" id="btn-monthly">Monthly</button>
+                                <div class="btn-group" role="group" aria-label="Trend type">
+                                    <button type="button" class="btn btn-outline-primary active" id="btn-mileage-trend">📈 Mileage</button>
+                                    <button type="button" class="btn btn-outline-primary" id="btn-pace-trend">⚡ Pace</button>
                                 </div>
                             </div>
-                            <div id="mileage-trend-chart"></div>
-                            <div class="mt-2 text-center">
-                                <small class="text-muted">Shows per-period totals (not cumulative).</small>
+
+                            <!-- Mileage Trend View -->
+                            <div id="mileage-trend-view">
+                                {% if analysis.mileage_trend_daily %}
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="btn-group" role="group" aria-label="Mileage granularity">
+                                        <button type="button" class="btn btn-outline-primary active" id="btn-daily">Daily</button>
+                                        <button type="button" class="btn btn-outline-primary" id="btn-weekly">Weekly</button>
+                                        <button type="button" class="btn btn-outline-primary" id="btn-monthly">Monthly</button>
+                                    </div>
+                                </div>
+                                <div id="mileage-trend-chart"></div>
+                                <div class="mt-2 text-center">
+                                    <small class="text-muted">Shows per-period totals (not cumulative).</small>
+                                </div>
+                                {% else %}
+                                <p class="text-muted text-center">No running activities found to compute mileage trend.</p>
+                                {% endif %}
                             </div>
-                            {% else %}
-                            <p class="text-muted text-center">No running activities found to compute mileage trend.</p>
-                            {% endif %}
+
+                            <!-- Pace Trend View -->
+                            <div id="pace-trend-view" style="display:none;">
+                                {% if analysis.pace_trend_daily %}
+                                <div class="d-flex justify-content-center mb-3">
+                                    <div class="btn-group" role="group" aria-label="Pace granularity">
+                                        <button type="button" class="btn btn-outline-primary active" id="btn-pace-daily">Daily</button>
+                                        <button type="button" class="btn btn-outline-primary" id="btn-pace-weekly">Weekly</button>
+                                        <button type="button" class="btn btn-outline-primary" id="btn-pace-monthly">Monthly</button>
+                                    </div>
+                                </div>
+                                <div id="pace-trend-chart"></div>
+                                <div class="mt-2 text-center">
+                                    <small class="text-muted">Shows average pace per period. Lower values indicate faster pace.</small>
+                                </div>
+                                {% else %}
+                                <p class="text-muted text-center">No running activities found to compute pace trend.</p>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="tab-pane fade" id="pace-trend" role="tabpanel" aria-labelledby="pace-trend-tab">
-                            {% if analysis.pace_trend_daily %}
+                        <!-- Combined Heatmap Tab -->
+                        <div class="tab-pane fade" id="heatmap" role="tabpanel" aria-labelledby="heatmap-tab">
+                            <!-- Toggle Button -->
                             <div class="d-flex justify-content-center mb-3">
-                                <div class="btn-group" role="group" aria-label="Pace granularity">
-                                    <button type="button" class="btn btn-outline-primary active" id="btn-pace-daily">Daily</button>
-                                    <button type="button" class="btn btn-outline-primary" id="btn-pace-weekly">Weekly</button>
-                                    <button type="button" class="btn btn-outline-primary" id="btn-pace-monthly">Monthly</button>
-                                </div>
-                            </div>
-                            <div id="pace-trend-chart"></div>
-                            <div class="mt-2 text-center">
-                                <small class="text-muted">Shows average pace per period. Lower values indicate faster pace.</small>
-                            </div>
-                            {% else %}
-                            <p class="text-muted text-center">No running activities found to compute pace trend.</p>
-                            {% endif %}
-                        </div>
-                        <div class="tab-pane fade" id="streaks" role="tabpanel" aria-labelledby="streaks-tab">
-                            {% if analysis.total_runs and analysis.total_runs > 0 %}
-
-                            <!-- Streak Timeline (one block per day) -->
-                            <div class="mb-2 d-flex align-items-center justify-content-between">
-                                <div class="small text-muted">Timeline</div>
-                                <div class="d-flex align-items-center gap-3 small">
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#e0e0e0;border:1px solid #d0d0d0"></span> Non-Running
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#9bd3ae"></span> Easy
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#59a14f"></span> Moderate
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#2e7d32"></span> Big day
-                                </div>
-                            </div>
-                            <div id="streak-timeline" class="border rounded p-2" style="display:flex; flex-wrap:wrap; gap:2px;"></div>
-
-                            <div class="row text-center">
-                                <div class="col-md-3 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.running_active_days }}</div>
-                                        <div class="text-muted">Running Days</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.running_missed_days }}</div>
-                                        <div class="text-muted">Non-Running Days</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.current_streak_days }}</div>
-                                        <div class="text-muted">Current Streak</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.longest_gap_days }}</div>
-                                        <div class="text-muted">Longest Gap</div>
-                                    </div>
+                                <div class="btn-group" role="group" aria-label="Heatmap type">
+                                    <button type="button" class="btn btn-outline-primary active" id="btn-workout-heatmap">💪 All Workouts</button>
+                                    <button type="button" class="btn btn-outline-primary" id="btn-running-heatmap">🏃 Running</button>
                                 </div>
                             </div>
 
-                            {% if analysis.gap_spans and analysis.gap_spans|length > 0 %}
-                            <div class="mt-3">
-                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#gapDetails" aria-expanded="false" aria-controls="gapDetails">
-                                    Show Gap Details
-                                </button>
-                                <div class="collapse mt-2" id="gapDetails">
-                                    <div class="table-responsive">
-                                        <table class="table table-sm align-middle">
-                                            <thead>
-                                                <tr>
-                                                    <th>Gap Start</th>
-                                                    <th>Gap End</th>
-                                                    <th class="text-end">Days</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for gap in analysis.gap_spans %}
-                                                <tr>
-                                                    <td>{{ gap.start }}</td>
-                                                    <td>{{ gap.end }}</td>
-                                                    <td class="text-end">{{ gap.length }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <small class="text-muted">Gap days represent consecutive days with no runs within the selected period.</small>
+                            <!-- Workout Heatmap View -->
+                            <div id="workout-heatmap-view">
+                                {% if analysis.total_activities and analysis.total_activities > 0 %}
+                                <!-- Description -->
+                                <div class="alert alert-secondary py-2" role="alert">
+                                    This view tracks all your activities (running, cycling, workouts, etc.), showing your consistency across all workout types. It measures consecutive days with at least one activity, helping you understand your overall training commitment.
                                 </div>
-                            </div>
-                            {% else %}
-                                <p class="text-muted mb-0">No gaps — great consistency!</p>
-                            {% endif %}
-                            {% else %}
-                                <p class="text-muted mb-0">No running activities in this period to compute streaks.</p>
-                            {% endif %}
-                        </div>
 
-                        <!-- Workout Streaks Tab -->
-                        <div class="tab-pane fade" id="workout-streaks" role="tabpanel" aria-labelledby="workout-streaks-tab">
-                            {% if analysis.total_activities and analysis.total_activities > 0 %}
-                            <!-- Description -->
-                            <div class="alert alert-secondary py-2" role="alert">
-                                This view tracks all your activities (running, cycling, workouts, etc.), showing your consistency across all workout types. It measures consecutive days with at least one activity, helping you understand your overall training commitment.
+                                <!-- Workout Timeline -->
+                                <div class="mb-2 d-flex align-items-center justify-content-between">
+                                    <div class="small text-muted">Activity Timeline</div>
+                                    <div class="d-flex align-items-center gap-3 small">
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#e0e0e0;border:1px solid #d0d0d0"></span> No Activity
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ffd4a3"></span> &lt; 30 min
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ffb26b"></span> 30 min - 1.5h
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ff7b54"></span> 1.5h+
+                                    </div>
+                                </div>
+                                <div id="workout-streak-timeline" class="border rounded p-2" style="display:flex; flex-wrap:wrap; gap:2px;"></div>
+
+                                <div class="row text-center">
+                                    <div class="col-md-2 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_active_days }}</div>
+                                            <div class="text-muted">Workout Days</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_missed_days }}</div>
+                                            <div class="text-muted">Missed Days</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_current_streak_days }}</div>
+                                            <div class="text-muted">Current Streak</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_days_since_last if analysis.workout_days_since_last is not none else '—' }}</div>
+                                            <div class="text-muted">Days Since Last</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_longest_gap_days }}</div>
+                                            <div class="text-muted">Longest Gap</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_total_gap_days }}</div>
+                                            <div class="text-muted">Total Gap Days</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {% if analysis.workout_gap_spans and analysis.workout_gap_spans|length > 0 %}
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#workoutGapDetails" aria-expanded="false" aria-controls="workoutGapDetails">
+                                        Show Gap Details
+                                    </button>
+                                    <div class="collapse mt-2" id="workoutGapDetails">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Gap Start</th>
+                                                        <th>Gap End</th>
+                                                        <th class="text-end">Days</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for gap in analysis.workout_gap_spans %}
+                                                    <tr>
+                                                        <td>{{ gap.start }}</td>
+                                                        <td>{{ gap.end }}</td>
+                                                        <td class="text-end">{{ gap.length }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <small class="text-muted">Gap days represent consecutive days with no activities within the selected period.</small>
+                                    </div>
+                                </div>
+                                {% else %}
+                                    <p class="text-muted mb-0">No gaps — excellent consistency!</p>
+                                {% endif %}
+                                {% else %}
+                                    <p class="text-muted mb-0">No activities in this period to compute streaks.</p>
+                                {% endif %}
                             </div>
 
-                            <!-- Workout Timeline -->
-                            <div class="mb-2 d-flex align-items-center justify-content-between">
-                                <div class="small text-muted">Activity Timeline</div>
-                                <div class="d-flex align-items-center gap-3 small">
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#e0e0e0;border:1px solid #d0d0d0"></span> No Activity
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ffd4a3"></span> &lt; 30 min
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ffb26b"></span> 30 min - 1.5h
-                                    <span class="d-inline-block rounded" style="width:14px;height:14px;background:#ff7b54"></span> 1.5h+
+                            <!-- Running Heatmap View -->
+                            <div id="running-heatmap-view" style="display:none;">
+                                {% if analysis.total_runs and analysis.total_runs > 0 %}
+                                <!-- Streak Timeline (one block per day) -->
+                                <div class="mb-2 d-flex align-items-center justify-content-between">
+                                    <div class="small text-muted">Running Distance Timeline</div>
+                                    <div class="d-flex align-items-center gap-3 small">
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#e0e0e0;border:1px solid #d0d0d0"></span> No run
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#9bd3ae"></span> &lt; 3 mi
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#59a14f"></span> 3-6 mi
+                                        <span class="d-inline-block rounded" style="width:14px;height:14px;background:#2e7d32"></span> 6+ mi
+                                    </div>
                                 </div>
-                            </div>
-                            <div id="workout-streak-timeline" class="border rounded p-2" style="display:flex; flex-wrap:wrap; gap:2px;"></div>
+                                <div id="streak-timeline" class="border rounded p-2" style="display:flex; flex-wrap:wrap; gap:2px;"></div>
 
-                            <div class="row text-center">
-                                <div class="col-md-2 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_active_days }}</div>
-                                        <div class="text-muted">Workout Days</div>
+                                <div class="row text-center">
+                                    <div class="col-md-3 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.running_active_days }}</div>
+                                            <div class="text-muted">Running Days</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.running_missed_days }}</div>
+                                            <div class="text-muted">Non-Running Days</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.current_streak_days }}</div>
+                                            <div class="text-muted">Current Streak</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <div>
+                                            <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.longest_gap_days }}</div>
+                                            <div class="text-muted">Longest Gap</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-2 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_missed_days }}</div>
-                                        <div class="text-muted">Missed Days</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_current_streak_days }}</div>
-                                        <div class="text-muted">Current Streak</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_days_since_last if analysis.workout_days_since_last is not none else '—' }}</div>
-                                        <div class="text-muted">Days Since Last</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_longest_gap_days }}</div>
-                                        <div class="text-muted">Longest Gap</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2 mb-3">
-                                    <div>
-                                        <div class="fw-bold" style="font-size: 1.75rem;">{{ analysis.workout_total_gap_days }}</div>
-                                        <div class="text-muted">Total Gap Days</div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            {% if analysis.workout_gap_spans and analysis.workout_gap_spans|length > 0 %}
-                            <div class="mt-3">
-                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#workoutGapDetails" aria-expanded="false" aria-controls="workoutGapDetails">
-                                    Show Gap Details
-                                </button>
-                                <div class="collapse mt-2" id="workoutGapDetails">
-                                    <div class="table-responsive">
-                                        <table class="table table-sm align-middle">
-                                            <thead>
-                                                <tr>
-                                                    <th>Gap Start</th>
-                                                    <th>Gap End</th>
-                                                    <th class="text-end">Days</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for gap in analysis.workout_gap_spans %}
-                                                <tr>
-                                                    <td>{{ gap.start }}</td>
-                                                    <td>{{ gap.end }}</td>
-                                                    <td class="text-end">{{ gap.length }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
+                                {% if analysis.gap_spans and analysis.gap_spans|length > 0 %}
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#gapDetails" aria-expanded="false" aria-controls="gapDetails">
+                                        Show Gap Details
+                                    </button>
+                                    <div class="collapse mt-2" id="gapDetails">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Gap Start</th>
+                                                        <th>Gap End</th>
+                                                        <th class="text-end">Days</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for gap in analysis.gap_spans %}
+                                                    <tr>
+                                                        <td>{{ gap.start }}</td>
+                                                        <td>{{ gap.end }}</td>
+                                                        <td class="text-end">{{ gap.length }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <small class="text-muted">Gap days represent consecutive days with no runs within the selected period.</small>
                                     </div>
-                                    <small class="text-muted">Gap days represent consecutive days with no activities within the selected period.</small>
                                 </div>
+                                {% else %}
+                                    <p class="text-muted mb-0">No gaps — great consistency!</p>
+                                {% endif %}
+                                {% else %}
+                                    <p class="text-muted mb-0">No running activities in this period to compute streaks.</p>
+                                {% endif %}
                             </div>
-                            {% else %}
-                                <p class="text-muted mb-0">No gaps — excellent consistency!</p>
-                            {% endif %}
-                            {% else %}
-                                <p class="text-muted mb-0">No activities in this period to compute streaks.</p>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -404,7 +444,7 @@
 function setDateRange(days) {
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+    startDate.setDate(startDate.getDate() - (days - 1));
 
     document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
     document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
@@ -416,6 +456,21 @@ function setYearToDate() {
 
     document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
     document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
+}
+
+function setDateRangeAndSubmit(days) {
+    setDateRange(days);
+    document.getElementById('dateRangeForm').submit();
+}
+
+function setYearToDateAndSubmit() {
+    setYearToDate();
+    document.getElementById('dateRangeForm').submit();
+}
+
+function showCustomDatePickers() {
+    const customInputs = document.getElementById('customDateInputs');
+    customInputs.style.display = 'flex';
 }
 
 {% if analysis %}
@@ -463,9 +518,9 @@ function setYearToDate() {
 
     // Initialize chart when tab becomes visible
     var mileageChartInitialized = false;
-    var mileageTabButton = document.getElementById('mileage-trend-tab');
-    if (mileageTabButton) {
-        mileageTabButton.addEventListener('shown.bs.tab', function() {
+    var trendsTabButton = document.getElementById('trends-tab');
+    if (trendsTabButton) {
+        trendsTabButton.addEventListener('shown.bs.tab', function() {
             if (!mileageChartInitialized) {
                 showMileage(mileageDaily);
                 mileageChartInitialized = true;
@@ -500,20 +555,8 @@ function setYearToDate() {
         Plotly.newPlot('pace-trend-chart', figJson.data, figJson.layout, {responsive: true});
     }
 
-    // Initialize chart when tab becomes visible
+    // Pace chart will be initialized on demand when toggled
     var paceChartInitialized = false;
-    var paceTabButton = document.getElementById('pace-trend-tab');
-    if (paceTabButton) {
-        paceTabButton.addEventListener('shown.bs.tab', function() {
-            if (!paceChartInitialized) {
-                showPace(paceDaily);
-                paceChartInitialized = true;
-            } else {
-                // Resize existing chart when tab is shown
-                Plotly.Plots.resize('pace-trend-chart');
-            }
-        });
-    }
 
     function setActivePace(btnId){
         ['btn-pace-daily','btn-pace-weekly','btn-pace-monthly'].forEach(function(id){
@@ -602,6 +645,49 @@ function setYearToDate() {
         }
     })();
     {% endif %}
+
+    // Heatmap toggle functionality
+    document.getElementById('btn-running-heatmap')?.addEventListener('click', function() {
+        document.getElementById('running-heatmap-view').style.display = 'block';
+        document.getElementById('workout-heatmap-view').style.display = 'none';
+        this.classList.add('active');
+        document.getElementById('btn-workout-heatmap').classList.remove('active');
+    });
+
+    document.getElementById('btn-workout-heatmap')?.addEventListener('click', function() {
+        document.getElementById('running-heatmap-view').style.display = 'none';
+        document.getElementById('workout-heatmap-view').style.display = 'block';
+        this.classList.add('active');
+        document.getElementById('btn-running-heatmap').classList.remove('active');
+    });
+
+    // Trends toggle functionality
+    document.getElementById('btn-mileage-trend')?.addEventListener('click', function() {
+        document.getElementById('mileage-trend-view').style.display = 'block';
+        document.getElementById('pace-trend-view').style.display = 'none';
+        this.classList.add('active');
+        document.getElementById('btn-pace-trend').classList.remove('active');
+        // Resize mileage chart if already initialized
+        if (mileageChartInitialized) {
+            Plotly.Plots.resize('mileage-trend-chart');
+        }
+    });
+
+    document.getElementById('btn-pace-trend')?.addEventListener('click', function() {
+        document.getElementById('mileage-trend-view').style.display = 'none';
+        document.getElementById('pace-trend-view').style.display = 'block';
+        this.classList.add('active');
+        document.getElementById('btn-mileage-trend').classList.remove('active');
+        // Initialize pace chart on first view
+        {% if analysis.pace_trend_daily %}
+        if (!paceChartInitialized) {
+            showPace(paceDaily);
+            paceChartInitialized = true;
+        } else {
+            Plotly.Plots.resize('pace-trend-chart');
+        }
+        {% endif %}
+    });
 {% endif %}
 </script>
 {% endblock %}

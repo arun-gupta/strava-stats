@@ -53,10 +53,12 @@ class StravaAPI:
     def get_activities(self, access_token, start_date, end_date, per_page=200):
         """Fetch activities from Strava API"""
         headers = {'Authorization': f'Bearer {access_token}'}
-        
+
         # Convert dates to Unix timestamps
         start_timestamp = int(start_date.timestamp())
         end_timestamp = int(end_date.timestamp())
+
+        print(f"DEBUG: Fetching activities from {start_date} (timestamp: {start_timestamp}) to {end_date} (timestamp: {end_timestamp})")
         
         activities = []
         page = 1
@@ -85,7 +87,12 @@ class StravaAPI:
             # Strava API rate limit protection
             if len(page_activities) < per_page:
                 break
-        
+
+        print(f"DEBUG: Fetched {len(activities)} activities")
+        if activities:
+            print(f"DEBUG: First activity date: {activities[0].get('start_date_local')}")
+            print(f"DEBUG: Last activity date: {activities[-1].get('start_date_local')}")
+
         return activities
 
 strava_api = StravaAPI()
@@ -96,23 +103,27 @@ def index():
     if 'access_token' not in session:
         return render_template('login.html', auth_url=strava_api.get_auth_url())
 
-    # Get dates from POST form or use defaults (last 30 days)
+    # Get dates from POST form or use defaults (last 7 days)
     if request.method == 'POST':
         start_date_str = request.form.get('start_date')
         end_date_str = request.form.get('end_date')
     else:
-        # Default to last 30 days
+        # Default to last 7 days (full calendar days)
         end_date = datetime.now()
-        start_date = end_date - timedelta(days=30)
+        start_date = end_date - timedelta(days=6)
         start_date_str = start_date.strftime('%Y-%m-%d')
         end_date_str = end_date.strftime('%Y-%m-%d')
 
     try:
+        from datetime import timezone
+
         start_date = datetime.strptime(start_date_str, '%Y-%m-%d')
         end_date = datetime.strptime(end_date_str, '%Y-%m-%d')
 
-        # Add time to end date to include the full day
-        end_date = end_date.replace(hour=23, minute=59, second=59)
+        # Set to full day range: 00:00:00 to 23:59:59 in UTC
+        # This ensures we capture all activities on these calendar days regardless of timezone
+        start_date = start_date.replace(hour=0, minute=0, second=0, tzinfo=timezone.utc)
+        end_date = end_date.replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
 
     except ValueError:
         return "Invalid date format", 400
@@ -127,7 +138,7 @@ def index():
                              end_date=end_date_str)
 
     # Process activities data
-    analysis = process_activities(activities, session['access_token'])
+    analysis = process_activities(activities, session['access_token'], start_date, end_date)
 
     # Add date range to analysis results
     analysis['start_date'] = start_date_str
@@ -163,12 +174,21 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
-def process_activities(activities, access_token):
+def process_activities(activities, access_token, requested_start_date=None, requested_end_date=None):
     """Process activities data and generate analytics"""
     if not activities:
         return None
 
     df = pd.DataFrame(activities)
+
+    # Debug: Print available columns
+    print("DEBUG: Available columns:", df.columns.tolist() if not df.empty else "DataFrame is empty")
+    if not df.empty and 'start_date_local' in df.columns:
+        print("DEBUG: Sample start_date_local values:", df['start_date_local'].head().tolist())
+    if not df.empty and 'start_date' in df.columns:
+        print("DEBUG: Sample start_date values:", df['start_date'].head().tolist())
+    if not df.empty and 'moving_time' in df.columns:
+        print("DEBUG: Sample moving_time values:", df['moving_time'].head().tolist())
 
     # Normalize activity types - combine similar activities
     df['type'] = df['type'].replace({
@@ -178,9 +198,13 @@ def process_activities(activities, access_token):
     })
 
     # Determine common date range for all streak calculations
+    # Use requested date range if provided, otherwise fall back to activity dates
     common_date_range_start = None
     common_date_range_end = None
-    if 'start_date' in df.columns:
+    if requested_start_date and requested_end_date:
+        common_date_range_start = pd.to_datetime(requested_start_date).normalize()
+        common_date_range_end = pd.to_datetime(requested_end_date).normalize()
+    elif 'start_date' in df.columns:
         df['start_date_temp'] = pd.to_datetime(df['start_date'])
         common_date_range_start = df['start_date_temp'].min().normalize()
         common_date_range_end = df['start_date_temp'].max().normalize()
@@ -724,29 +748,52 @@ def process_activities(activities, access_token):
     workout_total_days_in_window = 0
 
     try:
-        if not df.empty and 'start_date' in df.columns:
+        # Determine the date range to use
+        if common_date_range_start and common_date_range_end:
+            workout_daily_index = pd.date_range(common_date_range_start, common_date_range_end, freq='D')
+            workout_total_days_in_window = len(workout_daily_index)
+
+        # Use start_date_local if available, otherwise start_date
+        date_column = 'start_date_local' if 'start_date_local' in df.columns else 'start_date'
+        print(f"DEBUG: Using date column: {date_column}")
+
+        if not df.empty and date_column in df.columns:
             # Work with all activities
             all_activities = df.copy()
-            all_activities['start_date'] = pd.to_datetime(all_activities['start_date'])
+            all_activities['start_date'] = pd.to_datetime(all_activities[date_column])
             all_activities = all_activities.set_index('start_date').sort_index()
+            print(f"DEBUG: all_activities shape: {all_activities.shape}")
+            print(f"DEBUG: all_activities index range: {all_activities.index.min()} to {all_activities.index.max()}")
+            print(f"DEBUG: 'moving_time' in columns: {'moving_time' in all_activities.columns}")
 
-            # Create daily index for full range
-            # Use common date range if available, otherwise fall back to all activities range
-            if common_date_range_start and common_date_range_end:
-                workout_daily_index = pd.date_range(common_date_range_start, common_date_range_end, freq='D')
-            else:
+            # If we didn't set the date range above, use activities' date range
+            if not common_date_range_start or not common_date_range_end:
                 workout_daily_index = pd.date_range(
                     all_activities.index.min().normalize(),
                     all_activities.index.max().normalize(),
                     freq='D'
                 )
+                workout_total_days_in_window = len(workout_daily_index)
 
             # Calculate total hours per day (moving_time is in seconds)
-            daily_workout_hours = all_activities.groupby(all_activities.index.normalize())['moving_time'].sum() / 3600
-            daily_workout_hours = daily_workout_hours.reindex(workout_daily_index, fill_value=0)
+            if 'moving_time' in all_activities.columns:
+                daily_workout_hours = all_activities.groupby(all_activities.index.normalize())['moving_time'].sum() / 3600
+                print(f"DEBUG: daily_workout_hours before reindex: {daily_workout_hours}")
+
+                # Convert workout_daily_index to timezone-aware to match daily_workout_hours
+                if daily_workout_hours.index.tz is not None and workout_daily_index.tz is None:
+                    workout_daily_index = workout_daily_index.tz_localize('UTC')
+
+                daily_workout_hours = daily_workout_hours.reindex(workout_daily_index, fill_value=0)
+                print(f"DEBUG: daily_workout_hours after reindex: {daily_workout_hours}")
+            else:
+                # If moving_time column doesn't exist, create empty series
+                daily_workout_hours = pd.Series(0, index=workout_daily_index)
+                print("DEBUG: moving_time column not found, created empty series")
 
             # Boolean series for workout/no-workout per day
             workout_days = daily_workout_hours > 0
+            print(f"DEBUG: workout_days sum: {workout_days.sum()}")
 
             # Current streak: consecutive workout days ending on the last day
             for had_workout in reversed(workout_days.tolist()):
