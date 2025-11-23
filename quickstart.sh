@@ -79,5 +79,28 @@ echo ""
 echo "===================================="
 echo ""
 
+# Function to open browser after a delay
+open_browser() {
+    sleep 2  # Wait for Flask to start
+    url="http://localhost:3000"
+
+    # Detect OS and open browser accordingly
+    if command -v xdg-open > /dev/null; then
+        # Linux
+        xdg-open "$url" 2>/dev/null &
+    elif command -v open > /dev/null; then
+        # macOS
+        open "$url" 2>/dev/null &
+    elif command -v start > /dev/null; then
+        # Windows (Git Bash/WSL)
+        start "$url" 2>/dev/null &
+    else
+        echo "⚠️  Could not detect browser command. Please open $url manually."
+    fi
+}
+
+# Open browser in background
+open_browser &
+
 # Run the application
 python app.py
