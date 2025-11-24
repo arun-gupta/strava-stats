@@ -36,15 +36,15 @@ A Python Flask web application that connects to your Strava account and provides
 
 <table>
   <tr>
-    <td width="25%"><a href="images/activity-count.png"><img src="images/activity-count.png" alt="Activity Count"/></a><br/><sub>Activity Count</sub></td>
+    <td width="25%"><a href="images/overview.png"><img src="images/overview.png" alt="Overview"/></a><br/><sub>Overview</sub></td>
     <td width="25%"><a href="images/duration.png"><img src="images/duration.png" alt="Duration"/></a><br/><sub>Duration</sub></td>
-    <td width="25%"><a href="images/workout-heatmap.png"><img src="images/workout-heatmap.png" alt="Workout Heatmap"/></a><br/><sub>Workout Heatmap</sub></td>
-    <td width="25%"><a href="images/running-heatmap.png"><img src="images/running-heatmap.png" alt="Running Heatmap"/></a><br/><sub>Running Heatmap</sub></td>
+    <td width="25%"><a href="images/heatmap-all.png"><img src="images/heatmap-all.png" alt="All Workouts Heatmap"/></a><br/><sub>All Workouts Heatmap</sub></td>
+    <td width="25%"><a href="images/heatmap-running.png"><img src="images/heatmap-running.png" alt="Running Heatmap"/></a><br/><sub>Running Heatmap</sub></td>
   </tr>
   <tr>
     <td width="25%"><a href="images/running-stats.png"><img src="images/running-stats.png" alt="Running Stats"/></a><br/><sub>Running Stats</sub></td>
-    <td width="25%"><a href="images/mileage-trend.png"><img src="images/mileage-trend.png" alt="Mileage Trend"/></a><br/><sub>Mileage Trend</sub></td>
-    <td width="25%"><a href="images/pace-trend.png"><img src="images/pace-trend.png" alt="Pace Trend"/></a><br/><sub>Pace Trend</sub></td>
+    <td width="25%"><a href="images/trends-mileage.png"><img src="images/trends-mileage.png" alt="Mileage Trend"/></a><br/><sub>Mileage Trend</sub></td>
+    <td width="25%"><a href="images/trends-pace.png"><img src="images/trends-pace.png" alt="Pace Trend"/></a><br/><sub>Pace Trend</sub></td>
     <td width="25%"></td>
   </tr>
 </table>
