@@ -1,4 +1,4 @@
-# Strava Activity Analyzer
+# Strava Activity Analyzer (Python)
 
 A Python Flask web application that connects to your Strava account and provides detailed analytics about your activities including activity distribution, time tracking, running metrics, pace analysis, personal records, and consistency tracking through heatmaps.
 
